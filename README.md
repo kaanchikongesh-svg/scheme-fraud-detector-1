@@ -46,11 +46,37 @@ GovKavach AI is an enterprise welfare scheme fraud detection, AI document verifi
 
 ---
 
+## 📁 Project Architecture & Directory Structure
+
+```
+├── frontend/             # React 19 + Vite Web Application
+│   ├── src/              # Components, Contexts, Pages, Hooks
+│   ├── public/           # Favicon, SVG Logo Assets
+│   ├── package.json      # Dependencies & Scripts
+│   ├── vite.config.js    # Vite Bundler Configuration
+│   ├── vercel.json       # Vercel Deployment Configuration
+│   └── Dockerfile        # Production Multi-Stage NGINX Image
+├── backend/              # Python FastAPI + PyMuPDF + RapidOCR AI Engine
+│   ├── main.py           # Single ASGI Application Entrypoint
+│   ├── ai_engine.py      # Graph Centrality & Risk Scorer
+│   ├── document_service.py # OCR Extraction & Tampering Forensics
+│   ├── db_models.py      # SQLAlchemy Schema Models
+│   ├── database.py       # DB Session & Connection Manager
+│   ├── mongodb/          # MongoDB Atlas Dual-Write Repository
+│   ├── requirements.txt  # Python Dependencies
+│   └── Dockerfile        # Backend Production Container Image
+├── docker-compose.yml    # Full-Stack Orchestration (Frontend + Backend + DB)
+├── render.yaml           # Render Cloud Blueprint
+└── .env.example          # Environment Configuration Checklist
+```
+
+---
+
 ## 🚀 Quickstart Guide
 
-### 1. Run Frontend (Instant Demo Mode)
-The frontend comes pre-loaded with synthetic data containing planted fraud patterns:
+### 1. Run Frontend (React / Vite)
 ```bash
+cd frontend
 npm install
 npm run dev
 ```

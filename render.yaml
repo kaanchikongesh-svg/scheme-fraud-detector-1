@@ -1,4 +1,18 @@
 services:
+  # ─── React Frontend Static Site ──────────────────────────────────────────────
+  - type: web
+    name: govkavach-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: govkavach-backend
+          property: host
+
   # ─── Python FastAPI Backend Service ──────────────────────────────────────────
   - type: web
     name: govkavach-backend

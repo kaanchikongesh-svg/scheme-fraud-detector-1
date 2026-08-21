@@ -1,0 +1,23 @@
+// Synthetic Districts — 20 districts across Indian states
+export const districts = [
+  { id: 1,  name: 'Chennai',       state: 'Tamil Nadu',       lat: 13.0827, lng: 80.2707, fraudDensity: 0.18 },
+  { id: 2,  name: 'Coimbatore',    state: 'Tamil Nadu',       lat: 11.0168, lng: 76.9558, fraudDensity: 0.12 },
+  { id: 3,  name: 'Madurai',       state: 'Tamil Nadu',       lat: 9.9252,  lng: 78.1198, fraudDensity: 0.22 },
+  { id: 4,  name: 'Salem',         state: 'Tamil Nadu',       lat: 11.6643, lng: 78.1460, fraudDensity: 0.09 },
+  { id: 5,  name: 'Tiruchirappalli', state: 'Tamil Nadu',     lat: 10.7905, lng: 78.7047, fraudDensity: 0.15 },
+  { id: 6,  name: 'Mumbai',        state: 'Maharashtra',      lat: 19.0760, lng: 72.8777, fraudDensity: 0.31 },
+  { id: 7,  name: 'Pune',          state: 'Maharashtra',      lat: 18.5204, lng: 73.8567, fraudDensity: 0.14 },
+  { id: 8,  name: 'Nagpur',        state: 'Maharashtra',      lat: 21.1458, lng: 79.0882, fraudDensity: 0.11 },
+  { id: 9,  name: 'Sivagangai',    state: 'tamil nadu',            lat: 28.6139, lng: 77.2090, fraudDensity: 0.28 },
+  { id: 10, name: 'Bengaluru',     state: 'Karnataka',        lat: 12.9716, lng: 77.5946, fraudDensity: 0.16 },
+  { id: 11, name: 'Mysuru',        state: 'Karnataka',        lat: 12.2958, lng: 76.6394, fraudDensity: 0.08 },
+  { id: 12, name: 'Hyderabad',     state: 'Telangana',        lat: 17.3850, lng: 78.4867, fraudDensity: 0.20 },
+  { id: 13, name: 'Kolkata',       state: 'West Bengal',      lat: 22.5726, lng: 88.3639, fraudDensity: 0.25 },
+  { id: 14, name: 'Jaipur',        state: 'Rajasthan',        lat: 26.9124, lng: 75.7873, fraudDensity: 0.17 },
+  { id: 15, name: 'Lucknow',       state: 'Uttar Pradesh',    lat: 26.8467, lng: 80.9462, fraudDensity: 0.29 },
+  { id: 16, name: 'Patna',         state: 'Bihar',            lat: 25.5941, lng: 85.1376, fraudDensity: 0.33 },
+  { id: 17, name: 'Bhopal',        state: 'Madhya Pradesh',   lat: 23.2599, lng: 77.4126, fraudDensity: 0.13 },
+  { id: 18, name: 'Ahmedabad',     state: 'Gujarat',          lat: 23.0225, lng: 72.5714, fraudDensity: 0.10 },
+  { id: 19, name: 'Chandigarh',    state: 'Punjab',           lat: 30.7333, lng: 76.7794, fraudDensity: 0.07 },
+  { id: 20, name: 'Guwahati',      state: 'Assam',            lat: 26.1445, lng: 91.7362, fraudDensity: 0.19 },
+];

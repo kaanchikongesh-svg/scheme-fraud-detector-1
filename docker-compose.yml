@@ -3,8 +3,8 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -15,12 +15,12 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://verdant:verdant_pass@db:5432/leakage_db
-      - SECRET_KEY=verdant-shield-secret-key-CHANGE-IN-PRODUCTION-2024
+      - SECRET_KEY=govkavach-ai-secret-key-CHANGE-IN-PRODUCTION-2026
       - ACCESS_TOKEN_EXPIRE_MINUTES=480
       - MONGODB_ENABLED=${MONGODB_ENABLED:-false}
       - MONGODB_DUAL_WRITE=${MONGODB_DUAL_WRITE:-false}
