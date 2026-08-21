@@ -4,7 +4,10 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any
 
-import fitz
+try:
+    import pymupdf as fitz
+except ImportError:
+    import fitz
 
 
 def load_pdf(source: str | Path | bytes, render_dpi: int = 144, max_pages: int = 8) -> dict[str, Any]:

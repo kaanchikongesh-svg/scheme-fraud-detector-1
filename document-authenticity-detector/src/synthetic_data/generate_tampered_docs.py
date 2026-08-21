@@ -7,7 +7,10 @@ import random
 from pathlib import Path
 
 import cv2
-import fitz
+try:
+    import pymupdf as fitz
+except ImportError:
+    import fitz
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 

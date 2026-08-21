@@ -28,7 +28,7 @@ export default function Header({ pathname }) {
   const [search, setSearch] = useState('');
   const [backendConnected, setBackendConnected] = useState(false);
   const notifRef = useRef(null);
-  const page = pageTitles[pathname] || (pathname.startsWith('/applications/') ? { title: 'Application Detail', subtitle: 'Application evidence, history, and advisory AI analysis' } : { title: 'Verdant Shield', subtitle: 'AI Scheme Leakage Detector' });
+  const page = pageTitles[pathname] || (pathname.startsWith('/applications/') ? { title: 'Application Detail', subtitle: 'Application evidence, history, and advisory AI analysis' } : { title: 'GovKavach AI', subtitle: 'AI Scheme Leakage & Fraud Detector' });
   const unreadCount = notifications.filter(n => n.unread).length;
 
   useEffect(() => {

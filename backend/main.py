@@ -62,7 +62,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Verdant Shield — AI Leakage Probability Detection API",
+    title="GovKavach AI — Scheme Leakage & Fraud Detection API",
     description=(
         "Backend services for welfare scheme management, "
         "AI leakage probability scoring, and network anomaly detection. "
@@ -75,14 +75,42 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+cors_origins = list(settings.CORS_ORIGINS)
+if settings.FRONTEND_URL and settings.FRONTEND_URL not in cors_origins:
+    cors_origins.append(settings.FRONTEND_URL.rstrip("/"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_origin_regex=r"http://localhost:\d+",
+    allow_origins=cors_origins,
+    allow_origin_regex=r"http://localhost:\d+|https://.*\.vercel\.app|https://.*\.onrender\.com|https://.*\.railway\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/health", tags=["Health"])
+@app.get("/api/v1/health", tags=["Health"])
+def health_check(db: Session = Depends(get_db)):
+    """System health check verifying database and MongoDB Atlas connectivity."""
+    db_status = "connected"
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+
+    mongo_status = "disabled"
+    if settings.MONGODB_ENABLED and settings.MONGODB_URI:
+        mongo_status = "connected" if mongo_repository._get_database() is not None else f"unreachable ({mongo_repository.last_error or 'timeout'})"
+
+    return {
+        "status": "ok",
+        "app": "GovKavach AI",
+        "version": "2.0.0",
+        "database": db_status,
+        "mongodb": mongo_status,
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+    }
 
 # ─── Auth utilities ──────────────────────────────────────────────────────────
 
@@ -621,7 +649,7 @@ def _send_reset_sms(mobile: str, token: str, user_name: str) -> None:
 
     try:
         import urllib.request
-        message = f"Dear {user_name}, your password reset OTP is: {token}. Valid for {settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES} minutes. - Verdant Shield"
+        message = f"Dear {user_name}, your password reset OTP is: {token}. Valid for {settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES} minutes. - GovKavach AI"
     except Exception:
         pass
 

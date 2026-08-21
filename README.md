@@ -1,11 +1,11 @@
-# 🛡️ Verdant Shield — AI Government Scheme Leakage Detection System
+# 🛡️ GovKavach AI — AI Government Scheme Leakage & Fraud Detection Platform
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB.svg?style=flat&logo=React&logoColor=black)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.2-646CFF.svg?style=flat&logo=Vite&logoColor=white)](https://vitejs.dev/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?style=flat&logo=Docker&logoColor=white)](https://www.docker.com/)
 
-An AI-powered welfare scheme fraud detection and explainable risk-scoring platform built for government administrators, district officers, and verifying authorities.
+GovKavach AI is an enterprise welfare scheme fraud detection, AI document verification, and explainable risk-scoring platform built for government administrators, district officers, and verifying authorities.
 
 ---
 

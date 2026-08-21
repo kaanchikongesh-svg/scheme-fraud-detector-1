@@ -51,12 +51,12 @@ class EmailService:
         reset_link = f"{self.frontend_url}/reset-password/{reset_token}"
         expire_minutes = settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES
 
-        subject = "Reset your AI Government Scheme Leakage Detector password"
+        subject = "Reset your GovKavach AI Password — Welfare Scheme Leakage Detector"
 
         # Plain Text Body
         text_body = f"""Hello {recipient_name},
 
-We received a request to reset your account password for Verdant Shield - AI Government Scheme Leakage Detector.
+We received a request to reset your account password for GovKavach AI - AI Government Scheme Leakage & Fraud Detector.
 
 Reset your password using the secure link below:
 {reset_link}
@@ -66,7 +66,7 @@ This link expires in {expire_minutes} minutes and can only be used once.
 If you did not request this reset, you can safely ignore this email. Your password will remain unchanged.
 
 ---
-Verdant Shield Security Team
+GovKavach AI Security Team
 AI Government Scheme Leakage Detector
 """
 
@@ -90,10 +90,10 @@ AI Government Scheme Leakage Detector
                 <tr>
                   <td>
                     <div style="font-size: 24px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;">
-                      🛡️ Verdant Shield
+                      GovKavach AI
                     </div>
                     <div style="font-size: 12px; color: #93c5fd; margin-top: 4px; letter-spacing: 0.5px;">
-                      AI Government Scheme Leakage Detector
+                      AI Government Scheme Leakage & Fraud Detector
                     </div>
                   </td>
                 </tr>

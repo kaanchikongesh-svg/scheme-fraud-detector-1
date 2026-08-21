@@ -70,10 +70,10 @@ export default function Sidebar({ user, onLogout }) {
     <aside className="sidebar">
       {/* Logo */}
       <div className="sidebar-logo">
-        <div className="sidebar-logo-icon">🛡️</div>
+        <img src="/logo.svg" alt="GovKavach AI Logo" style={{ width: 34, height: 34, filter: 'drop-shadow(0 2px 8px rgba(37,99,235,0.4))' }} />
         <div className="sidebar-logo-text">
-          <h1>Verdant Shield</h1>
-          <span>Scheme Monitor</span>
+          <h1>GovKavach AI</h1>
+          <span>Scheme Integrity</span>
         </div>
       </div>
 

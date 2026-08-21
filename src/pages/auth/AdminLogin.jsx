@@ -41,10 +41,10 @@ export default function AdminLogin() {
     <div className="login-page">
       <div className="login-left" style={{ background: 'linear-gradient(135deg, #070d18 0%, #0c1a30 50%, #1e3a8a 100%)' }}>
         <div className="login-logo-area">
-          <div className="login-logo" style={{ fontSize: 44, filter: 'drop-shadow(0 4px 12px rgba(37,99,235,0.4))' }}>🏛️</div>
-          <div className="login-logo-title" style={{ fontSize: 26, letterSpacing: 0.5 }}>Official Admin Portal</div>
+          <img src="/logo.svg" alt="GovKavach AI" style={{ width: 60, height: 60, marginBottom: 12, filter: 'drop-shadow(0 4px 16px rgba(37,99,235,0.6))' }} />
+          <div className="login-logo-title" style={{ fontSize: 26, letterSpacing: 0.5 }}>GovKavach AI</div>
           <div className="login-logo-sub" style={{ fontSize: 13, color: '#93c5fd', marginTop: 6 }}>
-            AI Government Scheme Leakage Detector & Adjudication Console
+            State Administration & Scheme Leakage Adjudication Console
           </div>
           <div style={{ marginTop: 28, padding: '14px 18px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', maxWidth: 360 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', marginBottom: 4 }}>
