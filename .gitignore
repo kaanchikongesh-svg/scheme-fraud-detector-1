@@ -1,0 +1,59 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+backend/uploads/
+uploads/
+
+# Datasets and Large Data
+dataset/
+data/raw/
+data/processed/
+*.zip
+*.tar.gz
+
+# Kaggle & Credentials
+.kaggle/
+kaggle.json
+*.env
+*.env.*
+!*.env.example
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+backend/leakage.db
+leakage.db
+
+# Python & Caches
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Editor & System
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.agents/
+.tempmediaStorage/
+

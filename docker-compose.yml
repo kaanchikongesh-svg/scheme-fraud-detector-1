@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://verdant:verdant_pass@db:5432/leakage_db
+      - SECRET_KEY=verdant-shield-secret-key-CHANGE-IN-PRODUCTION-2024
+      - ACCESS_TOKEN_EXPIRE_MINUTES=480
+      - MONGODB_ENABLED=${MONGODB_ENABLED:-false}
+      - MONGODB_DUAL_WRITE=${MONGODB_DUAL_WRITE:-false}
+      - MONGODB_URI=${MONGODB_URI:-}
+      - MONGODB_DATABASE=${MONGODB_DATABASE:-government_scheme_leakage}
+      - MONGODB_CONNECT_TIMEOUT_MS=${MONGODB_CONNECT_TIMEOUT_MS:-1500}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=leakage_db
+      - POSTGRES_USER=verdant
+      - POSTGRES_PASSWORD=verdant_pass
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U verdant -d leakage_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
