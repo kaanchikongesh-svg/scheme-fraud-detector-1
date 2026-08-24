@@ -1,0 +1,10 @@
+backend
+document-authenticity-detector
+dataset
+.venv
+*.db
+*.py
+*.sh
+Dockerfile*
+docker-compose.yml
+render.yaml
