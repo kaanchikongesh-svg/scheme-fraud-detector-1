@@ -5,12 +5,12 @@ Auth uses real bcrypt password validation + HS256 JWT.
 All AI outputs use neutral, non-accusatory language.
 The AI Leakage Probability is advisory-only — no endpoint auto-rejects.
 """
-from fastapi import FastAPI, HTTPException, status, Depends, Query, File, UploadFile, Body, Form, Request, Response
+from fastapi import FastAPI, HTTPException, status, Depends, Query, File, UploadFile, Body, Form, Request
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, text
 from typing import List, Optional, Dict, Any, Union
 import sys
 import datetime
@@ -24,7 +24,7 @@ _backend_dir = str(Path(__file__).resolve().parent)
 if _backend_dir not in sys.path:
     sys.path.insert(0, _backend_dir)
 
-from jose import jwt, JWTError
+from jose import jwt, JWTError  # type: ignore
 from passlib.context import CryptContext
 
 from config import settings
@@ -92,10 +92,18 @@ _cors_origins_env = list(settings.CORS_ORIGINS)
 if settings.FRONTEND_URL and settings.FRONTEND_URL not in _cors_origins_env:
     _cors_origins_env.append(settings.FRONTEND_URL.rstrip("/"))
 
+_known_origins = [
+    "https://ai-scheme-leakage-detector.onrender.com",
+    "https://govkavach-ai.vercel.app",
+]
+for _origin in _known_origins:
+    if _origin not in _cors_origins_env:
+        _cors_origins_env.append(_origin)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins_env,
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|0\.0\.0\.0):\d+|https://.*\.(vercel\.app|onrender\.com|railway\.app)",
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|0\.0\.0\.0):\d+|https://.*\.(vercel\.app|onrender\.com|railway\.app|netlify\.app|github\.io)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -103,7 +111,7 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get("/", tags=["Root"])
 def root():
     return {
         "status": "success",
@@ -111,24 +119,12 @@ def root():
     }
 
 
-@app.get("/health")
-def health_check():
-    return {
-        "status": "healthy"
-    }
-
-
-@app.get("/favicon.ico", include_in_schema=False)
-def favicon():
-    return Response(status_code=204)
-
-
+@app.get("/health", tags=["Health"])
 @app.get("/api/v1/health", tags=["Health"])
-def api_health_check(db: Session = Depends(get_db)):
+def health_check(db: Session = Depends(get_db)):
     """System health check verifying database and MongoDB Atlas connectivity."""
     db_status = "connected"
     try:
-        from sqlalchemy import text
         db.execute(text("SELECT 1"))
     except Exception as e:
         db_status = f"error: {str(e)}"
@@ -138,13 +134,19 @@ def api_health_check(db: Session = Depends(get_db)):
         mongo_status = "connected" if mongo_repository._get_database() is not None else f"unreachable ({mongo_repository.last_error or 'timeout'})"
 
     return {
-        "status": "healthy",
+        "status": "ok",
         "app": "SchemeSecure AI",
         "version": "2.0.0",
         "database": db_status,
         "mongodb": mongo_status,
-        "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    from fastapi import Response
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -159,7 +161,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def _create_token(data: dict) -> str:
     payload = data.copy()
-    payload["exp"] = datetime.datetime.utcnow() + datetime.timedelta(
+    payload["exp"] = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
@@ -219,7 +221,7 @@ def _get_engine(db: Session) -> LeakageProbabilityEngine:
 
 
 def _mask_phone(phone: Optional[str]) -> str:
-    value = str(phone or "")
+    value = phone or ""
     return f"******{value[-4:]}" if len(value) >= 4 else "******"
 
 
@@ -340,7 +342,7 @@ def _persist_document(upload: UploadFile, doc_type: str, beneficiary: Beneficiar
         size_bytes=len(content),
         sha256_hash=sha256_hash,
         uploaded_by=current_user.id,
-        uploaded_at=datetime.datetime.utcnow(),
+        uploaded_at=datetime.datetime.now(datetime.timezone.utc),
         verification_status=document_status,
         is_demo=False,
         ocr_extracted=combined_analysis,
@@ -396,7 +398,7 @@ def _persist_document(upload: UploadFile, doc_type: str, beneficiary: Beneficiar
     # MongoDB Atlas Verification Audit Record
     mongo_sync.verification_audit(
         application.application_number or str(application.id),
-        str(upload.filename or "uploaded-document"),
+        upload.filename or "uploaded-document",
         ai_forensics.get("document_authenticity", "AUTHENTIC"),
         cross_result.get("reasons", []),
     )
@@ -454,7 +456,7 @@ def _application_dict(application: Application, db: Session, include_details: bo
 # ─── 1. Health ────────────────────────────────────────────────────────────────
 
 @app.get("/healthz", tags=["System"])
-def healthz(db: Session = Depends(get_db)):
+def health(db: Session = Depends(get_db)):
     try:
         db.execute(func.now())
         db_status = "connected"
@@ -462,7 +464,7 @@ def healthz(db: Session = Depends(get_db)):
         db_status = "error"
     return {"status": "ok", "service": "government-scheme-leakage-detection-api", "db": db_status,
         "mongodb": mongo_sync.health(),
-        "timestamp": datetime.datetime.utcnow().isoformat(), "version": "2.0.0"}
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(), "version": "2.0.0"}
 
 
 # ─── 2. Auth ─────────────────────────────────────────────────────────────────
@@ -589,7 +591,7 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
         "district_id": new_user.district_id,
         "dob": new_user.dob,
         "address": new_user.address,
-        "created_at": datetime.datetime.utcnow(),
+        "created_at": datetime.datetime.now(datetime.timezone.utc),
     })
 
     token = _create_token({"sub": str(new_user.id), "role": new_user.role, "email": new_user.email})
@@ -634,7 +636,7 @@ _rate_limit_store = defaultdict(list)
 
 def _check_rate_limit(key: str, window_seconds: int) -> bool:
     """Simple in-memory rate limiter. Returns True if allowed, False if rate-limited."""
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc)
     cutoff = now - datetime.timedelta(seconds=window_seconds)
     _rate_limit_store[key] = [t for t in _rate_limit_store[key] if t > cutoff]
     if len(_rate_limit_store[key]) >= 5:
@@ -721,7 +723,7 @@ def forgot_password(payload: ForgotPasswordRequest, request: Request, db: Sessio
         # Generate cryptographically secure, single-use token
         raw_token = secrets.token_urlsafe(32)
         token_hash = _hash_token(raw_token)
-        expires_at = datetime.datetime.utcnow() + datetime.timedelta(minutes=settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES)
+        expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES)
 
         # Invalidate any previous unused tokens for this user
         db.query(PasswordResetToken).filter(
@@ -830,7 +832,8 @@ def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db))
             headers={"X-Error-Code": "RESET_TOKEN_ALREADY_USED"}
         )
 
-    if reset_token.expires_at < datetime.datetime.utcnow():
+    token_exp = reset_token.expires_at.replace(tzinfo=datetime.timezone.utc) if reset_token.expires_at and reset_token.expires_at.tzinfo is None else reset_token.expires_at
+    if token_exp and token_exp < datetime.datetime.now(datetime.timezone.utc):
         raise HTTPException(
             status_code=400,
             detail="This password reset link has expired (15-minute validity). Please request a new link.",
@@ -847,7 +850,7 @@ def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db))
 
     salt = bcrypt.gensalt()
     user.hashed_password = bcrypt.hashpw(payload.new_password.encode('utf-8'), salt).decode('utf-8')
-    reset_token.used_at = datetime.datetime.utcnow()
+    reset_token.used_at = datetime.datetime.now(datetime.timezone.utc)
 
     _write_audit(db, user.id, "PASSWORD_RESET_COMPLETED", "user", user.id)
     db.commit()
@@ -1110,7 +1113,8 @@ def create_scheme(
     current_user: User = Depends(require_roles(RoleEnum.admin)),
     db: Session = Depends(get_db),
 ):
-    scheme = Scheme(**payload.dict())
+    scheme_data = payload.model_dump()
+    scheme = Scheme(**scheme_data)
     db.add(scheme)
     db.commit()
     db.refresh(scheme)
@@ -1355,11 +1359,12 @@ def verify_document(document_id: int, payload: DocumentVerificationRequest = Bod
     document = _document_row(document_id, current_user, db)
     document.verification_status = payload.status
     document.verified_by = current_user.id
-    document.verified_at = datetime.datetime.utcnow()
+    document.verified_at = datetime.datetime.now(datetime.timezone.utc)
     document.rejection_reason = payload.reason if payload.status == "rejected" else None
     _write_audit(db, current_user.id, f"DOCUMENT_{payload.status.upper()}", "document", document.id, {"reason": payload.reason})
     if payload.status == "verified" and _required_documents_verified(document.application.beneficiary):
-        if str(document.application.beneficiary.status) in {"pending", "under_review"}:
+        beneficiary_status = str(getattr(document.application.beneficiary.status, "value", document.application.beneficiary.status or "")).lower()
+        if beneficiary_status in {"pending", "under_review"}:
             document.application.beneficiary.status = "approved"
     db.commit()
     db.refresh(document)
@@ -1851,7 +1856,7 @@ def create_application(payload: dict, current_user: User = Depends(get_current_u
         gender=payload.get("gender", beneficiary.gender),
         annual_income=payload.get("annual_income", beneficiary.declared_income),
         family_size=payload.get("family_size", 1),
-        submitted_at=datetime.datetime.utcnow(),
+        submitted_at=datetime.datetime.now(datetime.timezone.utc),
     )
     db.add(application)
     db.flush()
@@ -1898,7 +1903,7 @@ def evaluate_leakage_probability(
         pred.severity = result["severity"]
         pred.recommended_action = result["recommended_action"]
         pred.potential_leakage_amount = result["potential_leakage_amount"]
-        pred.predicted_at = datetime.datetime.utcnow()
+        pred.predicted_at = datetime.datetime.now(datetime.timezone.utc)
     else:
         pred = AIPrediction(
             application_id=app.id, beneficiary_id=beneficiary_id,
@@ -1918,7 +1923,7 @@ def evaluate_leakage_probability(
         "application_id": app.id,
         "beneficiary_id": beneficiary_id,
         **result,
-        "predicted_at": datetime.datetime.utcnow().isoformat(),
+        "predicted_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
 
 
