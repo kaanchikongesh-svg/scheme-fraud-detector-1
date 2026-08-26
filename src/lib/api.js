@@ -2,7 +2,20 @@
  * API client wrapper with base URL and auth token injection.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const getApiBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+  if (envUrl) {
+    return envUrl.replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    // In browser: using relative base path allows Vite dev server proxy to forward
+    // all requests whether accessed via localhost, 127.0.0.1, or LAN Wi-Fi IP (e.g. 192.168.x.x)
+    return '';
+  }
+  return 'http://127.0.0.1:8000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 class ApiClient {
   constructor(baseUrl = API_BASE_URL) {
@@ -54,18 +67,28 @@ class ApiClient {
       if (!response.ok) {
         let errorMsg = `Request failed (HTTP ${response.status})`;
         let errorCode = 'API_ERROR';
-        if (response.status === 409) errorCode = 'DUPLICATE_EMAIL';
-        else if (response.status === 400) errorCode = 'VALIDATION_ERROR';
-        else if (response.status === 401 || response.status === 403) errorCode = 'AUTHENTICATION_ERROR';
-        else if (response.status >= 500) errorCode = 'DATABASE_ERROR';
+        if (response.status === 409) {
+          errorCode = 'DUPLICATE_ACCOUNT';
+          errorMsg = 'An account with this email or mobile number already exists.';
+        } else if (response.status === 400) {
+          errorCode = 'VALIDATION_ERROR';
+          errorMsg = 'Please correct the highlighted fields.';
+        } else if (response.status === 401) {
+          errorCode = 'AUTHENTICATION_ERROR';
+          errorMsg = 'Invalid email or password.';
+        } else if (response.status === 403) {
+          errorCode = 'FORBIDDEN';
+          errorMsg = 'You do not have permission to perform this action.';
+        } else if (response.status >= 500) {
+          errorCode = 'DATABASE_ERROR';
+          errorMsg = 'Unable to complete the request. Please try again later.';
+        }
 
         try {
           const errBody = await response.json();
           if (errBody.error) errorCode = errBody.error;
-          // FastAPI sends `detail` — can be a string OR an array (Pydantic validation errors)
           if (errBody.detail) {
             if (Array.isArray(errBody.detail)) {
-              // Pydantic validation error array: [{loc, msg, type}]
               errorMsg = errBody.detail.map(e => e.msg || JSON.stringify(e)).join('; ');
             } else if (typeof errBody.detail === 'string') {
               errorMsg = errBody.detail;
@@ -78,7 +101,7 @@ class ApiClient {
             errorMsg = errBody.error;
           }
         } catch {
-          // Non-JSON error body — keep the HTTP status message
+          // Non-JSON error body — keep categorized message
         }
         const error = new Error(errorMsg);
         error.status = response.status;
@@ -89,20 +112,19 @@ class ApiClient {
       return await response.json();
     } catch (error) {
       if (error.name === 'AbortError') {
-        const err = new Error('Backend request timed out. Please verify backend service on port 8000.');
-        err.code = 'BACKEND_UNAVAILABLE';
+        const err = new Error('Backend request timed out. Please try again.');
+        err.code = 'BACKEND_TIMEOUT';
         err.status = 504;
         throw err;
       }
       if (!error.status) {
-        const err = new Error('Unable to connect to the backend server. Please verify the Python service is running on port 8000.');
+        const err = new Error('Backend service is unavailable. Please check that the backend service is running and accessible.');
         err.code = 'BACKEND_UNAVAILABLE';
         err.status = 503;
         throw err;
       }
       throw error;
     }
-
   }
 
   get(endpoint, options = {}) {

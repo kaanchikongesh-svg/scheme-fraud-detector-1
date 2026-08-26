@@ -91,12 +91,16 @@ function AppRoutes() {
   );
 }
 
+import { Analytics } from '@vercel/analytics/react';
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <AppRoutes />
+        <Analytics />
       </BrowserRouter>
     </AuthProvider>
   );
 }
+

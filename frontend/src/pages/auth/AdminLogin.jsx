@@ -41,8 +41,8 @@ export default function AdminLogin() {
     <div className="login-page">
       <div className="login-left" style={{ background: 'linear-gradient(135deg, #070d18 0%, #0c1a30 50%, #1e3a8a 100%)' }}>
         <div className="login-logo-area">
-          <img src="/logo.svg" alt="GovKavach AI" style={{ width: 60, height: 60, marginBottom: 12, filter: 'drop-shadow(0 4px 16px rgba(37,99,235,0.6))' }} />
-          <div className="login-logo-title" style={{ fontSize: 26, letterSpacing: 0.5 }}>GovKavach AI</div>
+          <img src="/logo.svg" alt="SchemeSecure AI" style={{ width: 60, height: 60, marginBottom: 12, filter: 'drop-shadow(0 4px 16px rgba(37,99,235,0.6))' }} />
+          <div className="login-logo-title" style={{ fontSize: 26, letterSpacing: 0.5 }}>SchemeSecure AI</div>
           <div className="login-logo-sub" style={{ fontSize: 13, color: '#93c5fd', marginTop: 6 }}>
             State Administration & Scheme Leakage Adjudication Console
           </div>

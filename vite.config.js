@@ -10,5 +10,22 @@ export default defineConfig({
   ],
   optimizeDeps: {
     include: ['react-is', 'recharts']
+  },
+  server: {
+    host: true,
+    port: 5173,
+    watch: {
+      ignored: ['**/dist/**', '**/.venv/**', '**/dataset/**', '**/backend/**', '**/frontend/dist/**']
+    },
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+      '/health': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      }
+    }
   }
 })

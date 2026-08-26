@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     SMTP_USERNAME: str = ""
     SMTP_PASSWORD: str = ""
     SMTP_FROM_EMAIL: str = "noreply@example.com"
-    SMTP_FROM_NAME: str = "GovKavach AI — Scheme Leakage Detector"
+    SMTP_FROM_NAME: str = "SchemeSecure AI — Scheme Fraud Detection & Verification System"
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False
     FRONTEND_URL: str = "http://localhost:5173"

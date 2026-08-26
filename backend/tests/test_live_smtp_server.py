@@ -103,7 +103,7 @@ def run_live_smtp_test():
         import email
         parsed_msg = email.message_from_bytes(raw_email_bytes)
 
-        assert "GovKavach AI" in parsed_msg["Subject"] or "Password" in parsed_msg["Subject"]
+        assert "SchemeSecure AI" in parsed_msg["Subject"] or "Password" in parsed_msg["Subject"]
         assert "citizen.applicant@example.com" in parsed_msg["To"]
 
         # Extract text and html payloads
@@ -111,10 +111,12 @@ def run_live_smtp_test():
         html_content = ""
         for part in parsed_msg.walk():
             ct = part.get_content_type()
+            payload = part.get_payload(decode=True)
+            payload_text = payload.decode("utf-8", errors="replace") if isinstance(payload, bytes) else str(payload or "")
             if ct == "text/plain":
-                text_content += part.get_payload(decode=True).decode("utf-8")
+                text_content += payload_text
             elif ct == "text/html":
-                html_content += part.get_payload(decode=True).decode("utf-8")
+                html_content += payload_text
 
         assert "Kongeshwaran K" in text_content
         assert "Kongeshwaran K" in html_content

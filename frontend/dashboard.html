@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard — SchemeSecure AI</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        <span>SchemeSecure<span style="color:#60a5fa;">AI</span></span>
+        <span class="brand-badge">National Portal</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+          <li><a href="schemes.html" class="nav-link">Schemes</a></li>
+          <li><a href="claims.html" class="nav-link">Claims & Audits</a></li>
+          <li><a href="verification.html" class="nav-link">Document Studio</a></li>
+          <li><a href="reports.html" class="nav-link">Reports</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions" id="header-user-container"></div>
+    </div>
+  </header>
+
+  <!-- Dashboard Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-title-group">
+        <h1>Welfare Leakage Analytics Dashboard</h1>
+        <p class="page-subtitle">Real-time AI anomaly detection, duplicate claim prevention, and risk intelligence</p>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button onclick="loadDashboardData()" class="btn btn-outline btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          Refresh Feed
+        </button>
+        <a href="claims.html" class="btn btn-primary btn-sm">
+          Review Pending Claims →
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="dashboard-loading" style="display:none; text-align:center; padding:12px; color:var(--accent-cyan); font-size:0.9rem;">
+      ⚡ Fetching real-time AI analytics from backend...
+    </div>
+
+    <!-- 4 KPI Stat Cards -->
+    <div class="grid-cards">
+      <div class="card stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Total Enrolled Beneficiaries</span>
+          <div class="stat-icon blue">👥</div>
+        </div>
+        <div class="stat-value" id="kpi-total-beneficiaries">--</div>
+        <div class="stat-meta positive">
+          <span>● Active Records Monitored</span>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Estimated Leakage Prevented</span>
+          <div class="stat-icon emerald">₹</div>
+        </div>
+        <div class="stat-value" id="kpi-leakage-prevented" style="color:var(--accent-emerald);">--</div>
+        <div class="stat-meta positive">
+          <span>↑ High risk claims mitigated</span>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Flagged High-Risk Anomalies</span>
+          <div class="stat-icon rose">🚨</div>
+        </div>
+        <div class="stat-value" id="kpi-flagged-count" style="color:var(--accent-rose);">--</div>
+        <div class="stat-meta negative">
+          <span>Requires Officer Investigation</span>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Verified & Clean Claims</span>
+          <div class="stat-icon amber">✓</div>
+        </div>
+        <div class="stat-value" id="kpi-approved-count" style="color:#60a5fa;">--</div>
+        <div class="stat-meta positive">
+          <span>Direct Benefit Transfers Cleared</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Risk Distribution Section -->
+    <div class="card" style="margin-bottom:28px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <div>
+          <h3 style="font-size:1.2rem;">AI Leakage Probability Distribution</h3>
+          <p style="color:var(--text-secondary); font-size:0.85rem;">Multi-tier risk categorization of beneficiary applications across all districts</p>
+        </div>
+        <span class="badge" style="background:rgba(16,185,129,0.15); color:#34d399;">Advisory Engine Active</span>
+      </div>
+
+      <div id="risk-breakdown-bars">
+        <div style="text-align:center; padding:24px; color:var(--text-muted);">Loading risk metrics...</div>
+      </div>
+    </div>
+
+    <!-- Recent High Risk Anomalies Table -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
+        <div>
+          <h3 style="font-size:1.2rem;">Recent High-Risk Anomaly Alerts</h3>
+          <p style="color:var(--text-secondary); font-size:0.85rem;">Real-time feed of multi-claim duplicates, forged income certificates, and invalid registrations</p>
+        </div>
+        <a href="claims.html" class="btn btn-sm btn-outline">View All Applications</a>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Applicant Name</th>
+              <th>AI Risk Score</th>
+              <th>Primary Leakage Indicator</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recent-alerts-tbody">
+            <tr>
+              <td colspan="5" style="text-align:center; padding:24px; color:var(--text-muted);">Loading recent alerts...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div style="max-width:1400px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>SchemeSecure AI © 2026 — AI Government Scheme Fraud Detection & Verification System</div>
+      <div style="display:flex; gap:16px;">
+        <a href="http://127.0.0.1:8000/docs" target="_blank" style="color:var(--text-muted);">API Swagger</a>
+        <a href="http://127.0.0.1:8000/api/v1/health" target="_blank" style="color:var(--text-muted);">Health Check</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

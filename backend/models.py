@@ -169,7 +169,7 @@ class NetworkGraphResponse(BaseModel):
 # ─── Complaints ───────────────────────────────────────────────
 
 class ComplaintCreate(BaseModel):
-    beneficiary_id: int
+    beneficiary_id: Optional[int] = None
     complaint_type: str
     description: str
     evidence_urls: Optional[List[str]] = None

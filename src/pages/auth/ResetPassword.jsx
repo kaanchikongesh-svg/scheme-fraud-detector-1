@@ -60,9 +60,9 @@ export default function ResetPassword() {
       <div className="login-page">
         <div className="login-left">
           <div className="login-logo-area">
-            <img src="/logo.svg" alt="GovKavach AI" style={{ width: 56, height: 56, marginBottom: 12, filter: 'drop-shadow(0 4px 14px rgba(37,99,235,0.5))' }} />
-            <div className="login-logo-title">GovKavach AI</div>
-            <div className="login-logo-sub">AI Government Scheme Leakage & Fraud Detector</div>
+            <img src="/logo.svg" alt="SchemeSecure AI" style={{ width: 56, height: 56, marginBottom: 12, filter: 'drop-shadow(0 4px 14px rgba(37,99,235,0.5))' }} />
+            <div className="login-logo-title">SchemeSecure AI</div>
+            <div className="login-logo-sub">AI Government Scheme Fraud Detection & Verification System</div>
           </div>
         </div>
         <div className="login-right">
@@ -92,9 +92,9 @@ export default function ResetPassword() {
     <div className="login-page">
       <div className="login-left">
         <div className="login-logo-area">
-          <img src="/logo.svg" alt="GovKavach AI" style={{ width: 56, height: 56, marginBottom: 12, filter: 'drop-shadow(0 4px 14px rgba(37,99,235,0.5))' }} />
-          <div className="login-logo-title">GovKavach AI</div>
-          <div className="login-logo-sub">AI Government Scheme Leakage & Fraud Detector</div>
+          <img src="/logo.svg" alt="SchemeSecure AI" style={{ width: 56, height: 56, marginBottom: 12, filter: 'drop-shadow(0 4px 14px rgba(37,99,235,0.5))' }} />
+          <div className="login-logo-title">SchemeSecure AI</div>
+          <div className="login-logo-sub">AI Government Scheme Fraud Detection & Verification System</div>
         </div>
       </div>
 

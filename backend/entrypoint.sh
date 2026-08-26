@@ -25,5 +25,5 @@ else:
 echo "🌱 Running database initialization and seed..."
 python seed.py
 
-echo "🚀 Starting GovKavach AI FastAPI server on port $PORT..."
+echo "🚀 Starting SchemeSecure AI FastAPI server on port $PORT..."
 exec uvicorn main:app --host 0.0.0.0 --port "$PORT"

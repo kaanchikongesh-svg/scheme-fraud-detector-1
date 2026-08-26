@@ -36,7 +36,7 @@ DISTRICTS_DATA = [
     {"id": 20, "name": "Nagpur",      "state": "Maharashtra",    "lat": 21.1458, "lng": 79.0882},
 ]
 
-SCHEMES_DATA = [
+SCHEMES_DATA: List[Dict[str, Any]] = [
     {
         "id": 1,  "name": "Kalaignar Magalir Urimai Thittam (KMUT) — Tamil Nadu",
         "description": "Monthly direct benefit transfer of ₹1,000 for women heads of eligible households in Tamil Nadu.",
@@ -188,7 +188,7 @@ SCHEMES_DATA = [
     },
 ]
 
-USERS_SEED = [
+USERS_SEED: List[Dict[str, Any]] = [
     {"id": 1, "name": "Admin Singh",         "email": "admin@gov.in",      "password": "admin123",   "role": "admin",             "district_id": None},
     {"id": 2, "name": "District Officer Rao", "email": "do.rao@gov.in",     "password": "officer123", "role": "district_officer",  "district_id": 10},
     {"id": 3, "name": "Verifying Officer K",  "email": "vo.k@gov.in",       "password": "officer123", "role": "verifying_officer", "district_id": 4},

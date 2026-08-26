@@ -11,15 +11,27 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
-from typing import List, Optional
+from typing import List, Optional, Dict, Any, Union
+import sys
 import datetime
 from pathlib import Path
+import bcrypt
+
+
+
+# Ensure backend directory is in sys.path so sibling imports resolve cleanly
+_backend_dir = str(Path(__file__).resolve().parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
 
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
 from config import settings
 from database import get_db, create_tables
+
+
+
 from db_models import (
     District, User, Scheme, Beneficiary, Application, ApplicationDocument,
     ApplicationStatusHistory, AIPrediction, FraudLog, Complaint, AuditLog,
@@ -44,7 +56,7 @@ from document_service import (
     read_upload, save_private_document, validate_doc_type, perform_cross_document_comparison,
     test_documents_pipeline,
 )
-from mongodb import mongo_sync
+from mongodb import mongo_sync, mongo_repository
 from email_service import email_service
 
 @asynccontextmanager
@@ -62,7 +74,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="GovKavach AI — Scheme Leakage & Fraud Detection API",
+    title="SchemeSecure AI — Scheme Fraud Detection & Verification API",
     description=(
         "Backend services for welfare scheme management, "
         "AI leakage probability scoring, and network anomaly detection. "
@@ -75,17 +87,19 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-cors_origins = list(settings.CORS_ORIGINS)
-if settings.FRONTEND_URL and settings.FRONTEND_URL not in cors_origins:
-    cors_origins.append(settings.FRONTEND_URL.rstrip("/"))
+# Build CORS origins list from settings — covers all local dev ports + production
+_cors_origins_env = list(settings.CORS_ORIGINS)
+if settings.FRONTEND_URL and settings.FRONTEND_URL not in _cors_origins_env:
+    _cors_origins_env.append(settings.FRONTEND_URL.rstrip("/"))
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
-    allow_origin_regex=r"http://localhost:\d+|https://.*\.vercel\.app|https://.*\.onrender\.com|https://.*\.railway\.app",
+    allow_origins=_cors_origins_env,
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|0\.0\.0\.0):\d+|https://.*\.(vercel\.app|onrender\.com|railway\.app)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 
@@ -95,6 +109,7 @@ def health_check(db: Session = Depends(get_db)):
     """System health check verifying database and MongoDB Atlas connectivity."""
     db_status = "connected"
     try:
+        from sqlalchemy import text
         db.execute(text("SELECT 1"))
     except Exception as e:
         db_status = f"error: {str(e)}"
@@ -105,16 +120,14 @@ def health_check(db: Session = Depends(get_db)):
 
     return {
         "status": "ok",
-        "app": "GovKavach AI",
+        "app": "SchemeSecure AI",
         "version": "2.0.0",
         "database": db_status,
         "mongodb": mongo_status,
         "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
     }
 
-# ─── Auth utilities ──────────────────────────────────────────────────────────
 
-import bcrypt
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
@@ -161,7 +174,7 @@ def require_roles(*roles: RoleEnum):
 
 
 def _write_audit(db: Session, user_id: Optional[int], action: str,
-                 entity_type: str = None, entity_id: int = None, details: dict = None):
+                 entity_type: Optional[str] = None, entity_id: Optional[int] = None, details: Optional[dict] = None):
     log = AuditLog(user_id=user_id, action=action, entity_type=entity_type,
                    entity_id=entity_id, details=details or {})
     db.add(log)
@@ -253,7 +266,7 @@ def _sync_application(application: Application, db: Session) -> None:
 
 
 def _sync_document(document: ApplicationDocument) -> None:
-    forensics = (document.ocr_extracted or {}).get("forensics") if isinstance(document.ocr_extracted, dict) else {}
+    forensics = (document.ocr_extracted or {}).get("forensics") or {}
     mongo_sync.document({
         "id": document.id,
         "application_id": document.application.application_number,
@@ -616,7 +629,7 @@ def _hash_token(token: str) -> str:
     return hashlib.sha256(token.encode('utf-8')).hexdigest()
 
 
-def _sync_user(user: User, db: Session = None):
+def _sync_user(user: User, db: Optional[Session] = None):
     """Sync updated user record to MongoDB if MongoDB Atlas sidecar is enabled."""
     try:
         mongo_sync.user({
@@ -649,7 +662,7 @@ def _send_reset_sms(mobile: str, token: str, user_name: str) -> None:
 
     try:
         import urllib.request
-        message = f"Dear {user_name}, your password reset OTP is: {token}. Valid for {settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES} minutes. - GovKavach AI"
+        message = f"Dear {user_name}, your password reset OTP is: {token}. Valid for {settings.PASSWORD_RESET_TOKEN_EXPIRE_MINUTES} minutes. - SchemeSecure AI"
     except Exception:
         pass
 
@@ -1347,7 +1360,7 @@ def verify_document(document_id: int, payload: DocumentVerificationRequest = Bod
 
 # ─── AI Document Testing & Verification Lab Endpoints ─────────────────────────
 
-SAMPLE_TEST_SCENARIOS = {
+SAMPLE_TEST_SCENARIOS: dict[str, Any] = {
     "perfect_match": {
         "id": "perfect_match",
         "title": "Clean Consistent Citizen Set",
@@ -1381,7 +1394,7 @@ SAMPLE_TEST_SCENARIOS = {
                 "doc_type": "income_certificate",
                 "filename": "Income_Certificate_Tahsildar.png",
                 "raw_text": "REVENUE DEPARTMENT - GOVT OF TAMIL NADU\nINCOME CERTIFICATE\nApplicant Name: Kongeshwaran S\nAnnual Income: Rs. 60,000\nDOB: 12/04/1995\nResiding at: 14 Anna Salai, Chennai District\nMobile: 9876543210\nCertificate No: TN-INC-2026-89421",
-                "name": "Kongeshwaran S",
+                "name": "Kongeshwaran P",
                 "dob": "1995-04-12",
                 "gender": "male",
                 "income": 60000.0,
@@ -1394,7 +1407,7 @@ SAMPLE_TEST_SCENARIOS = {
                 "doc_type": "bank_passbook",
                 "filename": "Canara_Bank_Passbook.png",
                 "raw_text": "CANARA BANK - CHENNAI MOUNT ROAD BRANCH\nAccount Holder: Kongeshwaran S\nAccount No: 109823456789\nRegistered Mobile: 9876543210\nAddress: 14 Anna Salai, Chennai, Tamil Nadu",
-                "name": "Kongeshwaran S",
+                "name": "Kongeshwaran P",
                 "dob": "1995-04-12",
                 "gender": "male",
                 "income": None,
@@ -1722,8 +1735,8 @@ def get_application_verification(application_id: str, current_user: User = Depen
     
     docs_summary = []
     for doc in (app_row.documents or []):
-        forensics = (doc.ocr_extracted or {}).get("forensics") if isinstance(doc.ocr_extracted, dict) else {}
-        extracted_fields = (doc.ocr_extracted or {}).get("fields") if isinstance(doc.ocr_extracted, dict) else {}
+        forensics = (doc.ocr_extracted or {}).get("forensics") or {}
+        extracted_fields = (doc.ocr_extracted or {}).get("fields") or {}
         docs_summary.append({
             "documentId": str(doc.id),
             "documentName": doc.document_name,
@@ -1745,7 +1758,7 @@ def get_application_verification(application_id: str, current_user: User = Depen
     
     # Required Document Checklist
     scheme_def = next((s for s in SCHEMES_DATA if s["id"] == app_row.scheme_id), None)
-    req_docs = scheme_def.get("required_documents", []) if scheme_def else []
+    req_docs: list[dict[str, Any]] = scheme_def.get("required_documents", []) if isinstance(scheme_def, dict) else []
     uploaded_types = {doc.doc_type or doc.document_type for doc in (app_row.documents or [])}
     
     checklist = []
@@ -1996,9 +2009,10 @@ def dashboard_summary(
     }
 
 
+@app.get("/api/v1/ai/network-graph", tags=["AI Leakage Probability"])
 @app.get("/api/v1/ai/network-graph/{beneficiary_id}", tags=["AI Leakage Probability"])
 def get_network_graph(
-    beneficiary_id: int,
+    beneficiary_id: Optional[int] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -2006,10 +2020,17 @@ def get_network_graph(
     Return a real graph of shared credentials (phone / bank account) centred on the given beneficiary.
     Edges are computed from actual DB rows — not hardcoded.
     """
+    # If no beneficiary_id provided, pick highest leakage risk beneficiary
+    if not beneficiary_id:
+        top_pred = db.query(AIPrediction).order_by(desc(AIPrediction.leakage_probability)).first()
+        beneficiary_id = top_pred.beneficiary_id if top_pred else 1
+
     # Get the focal beneficiary
     focal = db.query(Beneficiary).filter(Beneficiary.id == beneficiary_id).first()
     if not focal:
-        raise HTTPException(status_code=404, detail="Beneficiary not found")
+        focal = db.query(Beneficiary).first()
+    if not focal:
+        return {"nodes": [], "links": []}
 
     connected_ids = set([focal.id])
     edges = []

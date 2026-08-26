@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist/**', '.venv/**', 'dataset/**', 'backend/**']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -14,7 +14,12 @@ export default defineConfig([
       reactRefresh.configs.vite,
     ],
     languageOptions: {
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        api: 'readonly',
+        showToast: 'readonly',
+        Auth: 'readonly',
+      },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
@@ -26,9 +31,19 @@ export default defineConfig([
     },
   },
   {
-    files: ['src/components/ConcernBadge.jsx', 'src/components/RiskBadge.jsx', 'src/contexts/AuthContext.jsx'],
+    files: [
+      'src/components/ConcernBadge.jsx',
+      'src/components/RiskBadge.jsx',
+      'src/contexts/AuthContext.jsx'
+    ],
     rules: {
       'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
+    files: ['js/**/*.{js,jsx}'],
+    rules: {
+      'no-unused-vars': 'off',
     },
   },
 ])

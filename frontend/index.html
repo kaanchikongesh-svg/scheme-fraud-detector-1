@@ -1,13 +1,131 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="description" content="GovKavach AI — AI-Powered Welfare Scheme Leakage Detection, Document Verification, and Fraud Prevention Platform" />
-    <title>GovKavach AI — Government Scheme Leakage & Fraud Detector</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System</title>
+  <meta name="description" content="AI-driven welfare protection system preventing duplicate claims, ghost beneficiaries, and document forgery.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #3b82f6;">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+        <span>SchemeSecure<span style="color:#60a5fa;">AI</span></span>
+        <span class="brand-badge">National Portal</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="schemes.html" class="nav-link">Schemes</a></li>
+          <li><a href="claims.html" class="nav-link">Claims & Audits</a></li>
+          <li><a href="verification.html" class="nav-link">Document Studio</a></li>
+          <li><a href="reports.html" class="nav-link">Reports</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions" id="header-user-container">
+        <a href="login.html" class="btn btn-sm btn-primary">Sign In</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="main-content">
+    <section style="text-align:center; padding: 64px 20px 48px; max-width:900px; margin:0 auto;">
+      <span class="badge" style="background:rgba(37,99,235,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); font-size:0.85rem; padding:6px 14px; margin-bottom:20px;">
+        🛡️ NEXT-GEN WELFARE INTEGRITY PLATFORM
+      </span>
+      <h1 style="font-size: 3rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 20px; line-height: 1.15;">
+        Preventing Scheme Leakage & Safeguarding Public Welfare with <span style="background: linear-gradient(135deg, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AI Forensics</span>
+      </h1>
+      <p style="font-size: 1.15rem; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6;">
+        SchemeSecure AI delivers end-to-end multi-layer detection for ghost beneficiaries, cross-scheme duplicates, document tampering, and eligibility violations across national and state benefit programs.
+      </p>
+
+      <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
+        <a href="dashboard.html" class="btn btn-lg btn-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          Open AI Dashboard
+        </a>
+        <a href="verification.html" class="btn btn-lg btn-outline">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Test Document Forensics
+        </a>
+        <a href="schemes.html" class="btn btn-lg btn-emerald">
+          Browse Schemes
+        </a>
+      </div>
+    </section>
+
+    <!-- Key Capabilities Grid -->
+    <section style="margin-top: 32px;">
+      <h2 style="text-align:center; font-size:1.8rem; margin-bottom: 32px;">Comprehensive Anti-Leakage Capabilities</h2>
+      <div class="grid-cards" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+        
+        <div class="card">
+          <div class="stat-icon blue" style="margin-bottom:16px;">🔍</div>
+          <h3 style="font-size:1.25rem; margin-bottom:10px;">Ghost Beneficiary & Duplicate Detection</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6;">
+            High-speed cryptographic hash matching and entity resolution to detect recycled Aadhaar numbers, shared mobile numbers, and duplicate bank accounts in real-time.
+          </p>
+          <a href="claims.html" style="display:inline-block; margin-top:16px; font-weight:600; font-size:0.85rem;">Audit Claims →</a>
+        </div>
+
+        <div class="card">
+          <div class="stat-icon emerald" style="margin-bottom:16px;">📄</div>
+          <h3 style="font-size:1.25rem; margin-bottom:10px;">AI Document Authenticity Studio</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6;">
+            Forensic computer vision checks for pixel splicing (ELA), font baseline misalignments, stamp manipulations, and OCR cross-field mismatch against applicant profiles.
+          </p>
+          <a href="verification.html" style="display:inline-block; margin-top:16px; font-weight:600; font-size:0.85rem;">Run Document Test →</a>
+        </div>
+
+        <div class="card">
+          <div class="stat-icon amber" style="margin-bottom:16px;">📊</div>
+          <h3 style="font-size:1.25rem; margin-bottom:10px;">Predictive Leakage Scoring</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6;">
+            Multi-factor machine learning models evaluating income ceilings, employment records, family unit constraints, and previous rejection histories with neutral advisory scoring.
+          </p>
+          <a href="dashboard.html" style="display:inline-block; margin-top:16px; font-weight:600; font-size:0.85rem;">View Analytics →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Quick Access Demo Roles -->
+    <section style="margin-top: 48px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:32px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div>
+          <h3 style="font-size:1.3rem; margin-bottom:4px;">Ready to Explore?</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Sign in using predefined demo accounts for Admin, District Officer, Verifying Officer, or Citizen.</p>
+        </div>
+        <a href="login.html" class="btn btn-primary">Go to Login & Demo Access</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div style="max-width:1400px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>SchemeSecure AI © 2026 — AI Government Scheme Fraud Detection & Verification System</div>
+      <div style="display:flex; gap:16px;">
+        <a href="http://127.0.0.1:8000/docs" target="_blank" style="color:var(--text-muted);">FastAPI Docs</a>
+        <a href="http://127.0.0.1:8000/api/v1/health" target="_blank" style="color:var(--text-muted);">System Health</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+</body>
 </html>

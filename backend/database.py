@@ -21,8 +21,10 @@ if db_url.startswith("sqlite"):
     engine = create_engine(db_url, connect_args=connect_args, echo=False)
 else:
     try:
+        pg_connect_args = {"connect_timeout": 2}
         engine = create_engine(
             db_url,
+            connect_args=pg_connect_args,
             pool_pre_ping=True,
             pool_size=10,
             max_overflow=20,
@@ -31,7 +33,7 @@ else:
         with engine.connect() as conn:
             pass
     except Exception as e:
-        fallback_url = f"sqlite:///{sqlite_path}"
+        fallback_url = f"sqlite:///{sqlite_path.resolve().as_posix()}"
         connect_args = {"check_same_thread": False}
         engine = create_engine(fallback_url, connect_args=connect_args, echo=False)
 

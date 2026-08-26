@@ -37,7 +37,7 @@ export default function ApplicationDetail() {
   if (!application) return <div className="empty-state"><div className="empty-state-icon">📋</div><h3>Application not found</h3><p>{error || 'This application is unavailable.'}</p><button className="btn btn-secondary" onClick={() => navigate('/applications')}>Back to Applications</button></div>;
 
   async function action(newStatus, promptMessage) {
-    let note = '';
+    let note;
     if (newStatus === 'rejected') {
       const reasonInput = window.prompt('Please provide the official reason for rejecting this application:', 'Document or demographic mismatch detected during review');
       if (reasonInput === null) return;

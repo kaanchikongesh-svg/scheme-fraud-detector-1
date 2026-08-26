@@ -1,15 +1,13 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend, AreaChart, Area
 } from 'recharts';
-import StatCard from '../../components/StatCard.jsx';
 import ConcernBadge from '../../components/RiskBadge.jsx';
-import { SkeletonCard, SkeletonTable } from '../../components/SkeletonLoader.jsx';
+import { SkeletonTable } from '../../components/SkeletonLoader.jsx';
 import { useApplications, useApplicationSummary } from '../../hooks/useApplications.js';
 import { useDashboardSummary } from '../../hooks/useDashboard.js';
-import { useAuth } from '../../contexts/AuthContext.jsx';
 import api from '../../lib/api.js';
 
 const STATUS_CONFIG = {
@@ -35,10 +33,9 @@ function formatDate(dateStr) {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const { data: appData, loading: appLoading, refetch: refetchApps } = useApplications({ limit: 200 });
-  const { data: appSummary, loading: summaryLoading, refetch: refetchSummary } = useApplicationSummary();
+  const { data: appSummary, refetch: refetchSummary } = useApplicationSummary();
   const { data: dashSummary } = useDashboardSummary();
 
   const [activeFilter, setActiveFilter] = useState('all');
@@ -146,10 +143,11 @@ export default function AdminDashboard() {
 
   // Quick Adjudication Action
   async function handleQuickAction(appId, newStatus, promptMsg) {
-    let reason = '';
+    let reason;
     if (newStatus === 'rejected') {
-      reason = window.prompt('Please enter the official reason for rejection:', 'Document or eligibility criteria mismatch detected during review');
-      if (reason === null) return;
+      const input = window.prompt('Please enter the official reason for rejection:', 'Document or eligibility criteria mismatch detected during review');
+      if (input === null) return;
+      reason = input;
     } else {
       if (!window.confirm(promptMsg)) return;
       reason = promptMsg;

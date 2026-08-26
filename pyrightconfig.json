@@ -1,0 +1,20 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "extraPaths": [
+    "./backend",
+    "./.venv/Lib/site-packages"
+  ],
+  "include": [
+    "backend"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    ".venv",
+    "dist",
+    "frontend/dist"
+  ],
+  "pythonVersion": "3.14",
+  "pythonPlatform": "Windows"
+}
