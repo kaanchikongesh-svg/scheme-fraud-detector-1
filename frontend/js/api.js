@@ -4,7 +4,7 @@
 
 const API_BASE_URL = (
   (typeof window !== 'undefined' && (window.VITE_API_BASE_URL || window.VITE_API_URL || window.API_BASE_URL)) ||
-  (typeof window !== 'undefined' ? "" : "http://127.0.0.1:8000")
+  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.')) ? "" : "https://ai-scheme-leakage-detector.onrender.com")
 ).replace(/\/+$/, '');
 
 /**

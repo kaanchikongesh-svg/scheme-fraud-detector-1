@@ -5,7 +5,7 @@ Auth uses real bcrypt password validation + HS256 JWT.
 All AI outputs use neutral, non-accusatory language.
 The AI Leakage Probability is advisory-only — no endpoint auto-rejects.
 """
-from fastapi import FastAPI, HTTPException, status, Depends, Query, File, UploadFile, Body, Form, Request
+from fastapi import FastAPI, HTTPException, status, Depends, Query, File, UploadFile, Body, Form, Request, Response
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -103,9 +103,28 @@ app.add_middleware(
 )
 
 
-@app.get("/health", tags=["Health"])
+@app.get("/")
+def root():
+    return {
+        "status": "success",
+        "message": "AI Scheme Leakage Detector API is running"
+    }
+
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy"
+    }
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return Response(status_code=204)
+
+
 @app.get("/api/v1/health", tags=["Health"])
-def health_check(db: Session = Depends(get_db)):
+def api_health_check(db: Session = Depends(get_db)):
     """System health check verifying database and MongoDB Atlas connectivity."""
     db_status = "connected"
     try:
@@ -119,7 +138,7 @@ def health_check(db: Session = Depends(get_db)):
         mongo_status = "connected" if mongo_repository._get_database() is not None else f"unreachable ({mongo_repository.last_error or 'timeout'})"
 
     return {
-        "status": "ok",
+        "status": "healthy",
         "app": "SchemeSecure AI",
         "version": "2.0.0",
         "database": db_status,
@@ -434,9 +453,8 @@ def _application_dict(application: Application, db: Session, include_details: bo
 
 # ─── 1. Health ────────────────────────────────────────────────────────────────
 
-@app.get("/health", tags=["System"])
 @app.get("/healthz", tags=["System"])
-def health(db: Session = Depends(get_db)):
+def healthz(db: Session = Depends(get_db)):
     try:
         db.execute(func.now())
         db_status = "connected"

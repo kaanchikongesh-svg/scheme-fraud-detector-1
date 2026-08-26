@@ -8,9 +8,17 @@ const getApiBaseUrl = () => {
     return envUrl.replace(/\/+$/, '');
   }
   if (typeof window !== 'undefined') {
-    return '';
+    const isLocal = window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' || 
+                    window.location.hostname.startsWith('192.168.') ||
+                    window.location.hostname.startsWith('10.') ||
+                    window.location.hostname === '0.0.0.0';
+    if (isLocal) {
+      return '';
+    }
+    return 'https://ai-scheme-leakage-detector.onrender.com';
   }
-  return 'http://127.0.0.1:8000';
+  return 'https://ai-scheme-leakage-detector.onrender.com';
 };
 
 const API_BASE_URL = getApiBaseUrl();
