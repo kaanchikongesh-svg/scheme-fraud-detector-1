@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -21,8 +21,8 @@ def application_record(application: Application) -> dict:
         "status": str(getattr(application.status, "value", application.status)),
         "concernLevel": application.prediction.concern_level if application.prediction else None,
         "leakageProbability": application.prediction.leakage_probability if application.prediction else None,
-        "createdAt": application.submitted_at or datetime.utcnow(),
-        "updatedAt": datetime.utcnow(),
+        "createdAt": application.submitted_at or datetime.now(timezone.utc),
+        "updatedAt": datetime.now(timezone.utc),
     }
 
 
@@ -44,8 +44,9 @@ def document_record(document: ApplicationDocument) -> dict:
         "verificationStatus": document.verification_status,
         "ocrExtracted": document.ocr_extracted,
         "createdAt": document.uploaded_at,
-        "updatedAt": datetime.utcnow(),
+        "updatedAt": datetime.now(timezone.utc),
     }
+
 
 
 def migrate(batch_size: int, after_id: int) -> tuple[int, int]:

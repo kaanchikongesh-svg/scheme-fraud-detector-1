@@ -76,9 +76,8 @@ export function useBeneficiaryDetail(id) {
       await api.patch(`/api/v1/beneficiaries/${id}/status?new_status=${newStatus}${notes ? `&notes=${encodeURIComponent(notes)}` : ''}`);
       await fetchDetail();
       return { success: true };
-    } catch {
-      setBeneficiary(prev => prev ? { ...prev, status: newStatus } : prev);
-      return { success: true, isMock: true };
+    } catch (err) {
+      return { success: false, error: err.message || 'Failed to update beneficiary status' };
     }
   };
 
@@ -87,10 +86,11 @@ export function useBeneficiaryDetail(id) {
       const res = await api.post(`/api/v1/ai/evaluate/${id}`);
       await fetchDetail();
       return res;
-    } catch {
-      return null;
+    } catch (err) {
+      throw err;
     }
   };
+
 
   return { beneficiary, loading, error, isFallback, refetch: fetchDetail, updateStatus, reEvaluateAI };
 }

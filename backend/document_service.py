@@ -511,7 +511,7 @@ def perform_cross_document_comparison(documents: list[Any], db_session: Any = No
                     "doc_b_value": f2["name"],
                     "similarity": sim,
                     "reason": reason,
-                    "timestamp": datetime.datetime.utcnow().isoformat(),
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 })
                 if status == "MISMATCH":
                     has_hard_mismatch = True
@@ -538,7 +538,7 @@ def perform_cross_document_comparison(documents: list[Any], db_session: Any = No
                     "doc_b_value": f2["dob"],
                     "similarity": sim,
                     "reason": reason,
-                    "timestamp": datetime.datetime.utcnow().isoformat(),
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 })
                 if status == "MISMATCH":
                     has_hard_mismatch = True
@@ -565,7 +565,7 @@ def perform_cross_document_comparison(documents: list[Any], db_session: Any = No
                     "doc_b_value": f"₹{f2['income']:,.0f}",
                     "similarity": sim,
                     "reason": reason,
-                    "timestamp": datetime.datetime.utcnow().isoformat(),
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 })
                 if status == "MISMATCH":
                     has_hard_mismatch = True
@@ -595,7 +595,7 @@ def perform_cross_document_comparison(documents: list[Any], db_session: Any = No
                     "doc_b_value": f2.get("address") or f2.get("district") or "Not stated",
                     "similarity": sim,
                     "reason": reason,
-                    "timestamp": datetime.datetime.utcnow().isoformat(),
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 })
                 if status == "MISMATCH":
                     has_hard_mismatch = True
@@ -622,7 +622,7 @@ def perform_cross_document_comparison(documents: list[Any], db_session: Any = No
                     "doc_b_value": f2["phone"],
                     "similarity": sim,
                     "reason": reason,
-                    "timestamp": datetime.datetime.utcnow().isoformat(),
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 })
                 if status == "MISMATCH":
                     has_hard_mismatch = True
@@ -645,8 +645,9 @@ def perform_cross_document_comparison(documents: list[Any], db_session: Any = No
                     "doc_b_value": f2["gender"].title(),
                     "similarity": sim,
                     "reason": reason,
-                    "timestamp": datetime.datetime.utcnow().isoformat(),
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 })
+
                 if status == "MISMATCH":
                     has_hard_mismatch = True
                     signals["gender"] = "mismatch"
@@ -894,8 +895,9 @@ def test_documents_pipeline(
         "crossDocumentComparisons": cross_check["comparisons"],
         "applicantRecordComparisons": applicant_checks,
         "documentCount": len(processed_docs),
-        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
+
 
 
 

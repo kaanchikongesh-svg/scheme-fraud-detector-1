@@ -22,22 +22,29 @@ export default function ComplaintPortal() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      await fileComplaint({
-        beneficiary_id: Number(formData.beneficiary_id) || 1,
+      const rawTarget = (formData.beneficiary_id || '').trim();
+      const isNumeric = rawTarget !== '' && !isNaN(rawTarget);
+      const payload = {
+        beneficiary_id: isNumeric ? parseInt(rawTarget, 10) : undefined,
+        reported_target: rawTarget || undefined,
         complaint_type: formData.complaint_type,
         description: formData.description,
         evidence_urls: formData.evidence_notes ? [formData.evidence_notes] : [],
-      });
-      setSubmittedMessage(true);
-      setFormData({ beneficiary_id: '', complaint_type: 'duplicate_application', description: '', evidence_notes: '' });
-      setTimeout(() => {
-        setSubmittedMessage(false);
-        setActiveTab('list');
-      }, 2000);
+      };
+      const res = await fileComplaint(payload);
+      if (res?.success) {
+        setSubmittedMessage(true);
+        setFormData({ beneficiary_id: '', complaint_type: 'duplicate_application', description: '', evidence_notes: '' });
+        setTimeout(() => {
+          setSubmittedMessage(false);
+          setActiveTab('list');
+        }, 2000);
+      }
     } catch {
       // error handled by hook
     }
   }
+
 
   if (loading) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading complaints...</div>;
   if (error && isFallback) return <div className="alert-red">Backend unavailable. Cannot load complaints.</div>;

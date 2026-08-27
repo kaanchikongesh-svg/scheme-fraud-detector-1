@@ -1,12 +1,19 @@
 """
 Application settings via pydantic-settings.
-Reads from environment variables or a .env file in the backend/ directory.
+Reads from environment variables or a .env file in the backend/ or root directory.
 """
-from pydantic_settings import BaseSettings
-from pydantic import field_validator
-from typing import List, Union, Any
-from pathlib import Path
+import sys
 import json
+from pathlib import Path
+from typing import List, Union, Any
+
+# Ensure backend directory is in sys.path
+_backend_dir = str(Path(__file__).resolve().parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 
 
 class Settings(BaseSettings):
@@ -35,17 +42,19 @@ class Settings(BaseSettings):
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
-    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+    def assemble_cors_origins(cls, v: Union[str, List[str], Any]) -> List[str]:
         if isinstance(v, str):
             v_clean = v.strip()
             if v_clean.startswith("[") and v_clean.endswith("]"):
                 try:
-                    return json.loads(v_clean)
+                    parsed = json.loads(v_clean)
+                    if isinstance(parsed, list):
+                        return [str(item).strip() for item in parsed if str(item).strip()]
                 except Exception:
                     pass
             return [item.strip() for item in v_clean.split(",") if item.strip()]
         if isinstance(v, (list, tuple, set)):
-            return list(v)
+            return [str(item).strip() for item in v if str(item).strip()]
         return [str(v)]
 
     # Seeding
@@ -138,11 +147,17 @@ class Settings(BaseSettings):
             return int(v)
         return default_val
 
-    class Config:
-        env_file = (str(Path(__file__).resolve().parent / ".env"), ".env")
-        env_file_encoding = "utf-8"
-        extra = "ignore"
+    model_config = SettingsConfigDict(
+        env_file=(
+            str(Path(__file__).resolve().parent / ".env"),
+            str(Path(__file__).resolve().parent.parent / ".env"),
+            ".env"
+        ),
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
 
 
 settings = Settings()
+
 

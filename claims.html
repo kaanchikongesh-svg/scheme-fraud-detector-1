@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claims & Application Audits — SchemeSecure AI</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="index.html" class="brand-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        <span>SchemeSecure<span style="color:#60a5fa;">AI</span></span>
+        <span class="brand-badge">National Portal</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="schemes.html" class="nav-link">Schemes</a></li>
+          <li><a href="claims.html" class="nav-link active">Claims & Audits</a></li>
+          <li><a href="verification.html" class="nav-link">Document Studio</a></li>
+          <li><a href="reports.html" class="nav-link">Reports</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions" id="header-user-container"></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-title-group">
+        <h1>Welfare Claims & Applications Audit</h1>
+        <p class="page-subtitle">Inspect AI leakage risk scores, review multi-layer anomaly flags, and record officer decisions</p>
+      </div>
+
+      <button onclick="loadClaims()" class="btn btn-outline btn-sm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        Refresh Claims
+      </button>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input id="claims-search-input" type="text" class="form-input" placeholder="Search by applicant name, application #, or Aadhaar..." oninput="loadClaims()">
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <select id="claims-status-filter" class="form-select" onchange="loadClaims()">
+          <option value="all">All Application Statuses</option>
+          <option value="pending">Pending Review</option>
+          <option value="approved">Approved</option>
+          <option value="flagged">Flagged</option>
+          <option value="rejected">Rejected</option>
+        </select>
+
+        <select id="claims-concern-filter" class="form-select" onchange="loadClaims()">
+          <option value="all">All Risk Levels</option>
+          <option value="low">Low Risk (<30%)</option>
+          <option value="moderate">Moderate Risk (30-60%)</option>
+          <option value="high">High Risk (60-85%)</option>
+          <option value="critical">Critical Risk (>85%)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="claims-loading" style="display:none; text-align:center; padding:16px; color:var(--accent-cyan);">
+      Filtering claims database...
+    </div>
+
+    <!-- Claims Table Card -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Application #</th>
+            <th>Applicant & District</th>
+            <th>Welfare Scheme</th>
+            <th>AI Risk Score</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="claims-tbody">
+          <tr>
+            <td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted);">Loading claims...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Claim Audit Detail Modal -->
+  <div id="claim-audit-modal" class="modal-overlay">
+    <div class="modal-container" style="max-width:720px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.15rem;">Claim Investigation & AI Forensic Evidence</h3>
+        <button class="modal-close" onclick="closeModal('claim-audit-modal')">×</button>
+      </div>
+      <div id="claim-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div style="max-width:1400px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>SchemeSecure AI © 2026 — AI Government Scheme Fraud Detection & Verification System</div>
+      <div style="display:flex; gap:16px;">
+        <a href="http://127.0.0.1:8000/docs" target="_blank" style="color:var(--text-muted);">Swagger API</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/claims.js"></script>
+</body>
+</html>

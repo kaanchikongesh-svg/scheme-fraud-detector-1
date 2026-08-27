@@ -32,8 +32,8 @@ export function useComplaints() {
       const res = await api.post('/api/v1/complaints', payload);
       await fetchComplaints();
       return { success: true, complaint: res };
-    } catch {
-      return { success: false, error: 'Failed to file complaint' };
+    } catch (err) {
+      return { success: false, error: err.message || 'Failed to file complaint' };
     }
   };
 
@@ -42,10 +42,11 @@ export function useComplaints() {
       const res = await api.patch(`/api/v1/complaints/${id}/status`, { status, notes });
       await fetchComplaints();
       return { success: true, complaint: res };
-    } catch {
-      return { success: false, error: 'Failed to update complaint status' };
+    } catch (err) {
+      return { success: false, error: err.message || 'Failed to update complaint status' };
     }
   };
+
 
   return { data, loading, error, isFallback, refetch: fetchComplaints, fileComplaint, updateComplaintStatus };
 }

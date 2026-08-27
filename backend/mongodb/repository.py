@@ -1,7 +1,12 @@
-from __future__ import annotations
-
-from datetime import datetime
+import sys
+from pathlib import Path
+from datetime import datetime, timezone
 from typing import Any, Iterable
+
+# Ensure backend directory is in sys.path
+_backend_dir = str(Path(__file__).resolve().parent.parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
 
 try:
     from pymongo import ASCENDING, DESCENDING, MongoClient
@@ -68,7 +73,7 @@ class MongoRepository:
             user_id = str(user_doc.get("userId") or user_doc.get("id"))
             database.users.replace_one(
                 {"userId": user_id},
-                {**user_doc, "userId": user_id, "updatedAt": datetime.utcnow()},
+                {**user_doc, "userId": user_id, "updatedAt": datetime.now(timezone.utc)},
                 upsert=True,
             )
             return True
@@ -84,7 +89,7 @@ class MongoRepository:
             application_id = str(document["applicationId"])
             database.applications.replace_one(
                 {"applicationId": application_id},
-                {**document, "applicationId": application_id, "updatedAt": datetime.utcnow()},
+                {**document, "applicationId": application_id, "updatedAt": datetime.now(timezone.utc)},
                 upsert=True,
             )
             return True
@@ -100,7 +105,7 @@ class MongoRepository:
             document_id = str(document["documentId"])
             database.documents.replace_one(
                 {"documentId": document_id},
-                {**document, "documentId": document_id, "updatedAt": datetime.utcnow()},
+                {**document, "documentId": document_id, "updatedAt": datetime.now(timezone.utc)},
                 upsert=True,
             )
             return True
@@ -113,11 +118,12 @@ class MongoRepository:
         if database is None:
             return False
         try:
-            database.verification_audits.insert_one({**audit, "timestamp": audit.get("timestamp", datetime.utcnow())})
+            database.verification_audits.insert_one({**audit, "timestamp": audit.get("timestamp", datetime.now(timezone.utc))})
             return True
         except Exception as exc:
             self.last_error = str(exc)
             return False
+
 
     def migrate_documents(self, documents: Iterable[dict[str, Any]]) -> int:
         count = 0

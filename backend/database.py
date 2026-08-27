@@ -4,10 +4,19 @@ Supports PostgreSQL as well as local SQLite fallback with consistent absolute pa
 Import `get_db` as a FastAPI dependency to get a per-request session.
 """
 import os
+import sys
 from pathlib import Path
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+
+# Ensure backend directory is in sys.path
+_backend_dir = str(Path(__file__).resolve().parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
 from config import settings
+
+
 
 db_url = settings.DATABASE_URL
 connect_args = {}
@@ -153,6 +162,18 @@ def _migrate_legacy_sqlite_schema():
             for name, definition in user_additions.items():
                 if name not in user_columns:
                     connection.exec_driver_sql(f"ALTER TABLE users ADD COLUMN {name} {definition}")
+
+    if "complaints" in inspector.get_table_names():
+        complaint_columns = {column["name"] for column in inspector.get_columns("complaints")}
+        complaint_additions = {
+            "reported_target": "VARCHAR(255)",
+            "officer_action": "TEXT",
+            "updated_at": "DATETIME",
+        }
+        with engine.begin() as connection:
+            for name, definition in complaint_additions.items():
+                if name not in complaint_columns:
+                    connection.exec_driver_sql(f"ALTER TABLE complaints ADD COLUMN {name} {definition}")
 
     if "password_reset_tokens" not in inspector.get_table_names():
         with engine.begin() as connection:

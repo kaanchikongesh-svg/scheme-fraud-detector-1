@@ -4,13 +4,22 @@ Handles SMTP connection, email template compilation, and password reset delivery
 """
 import smtplib
 import ssl
+import sys
 import logging
+from pathlib import Path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr
 from typing import Dict, Any
 
+# Ensure backend directory is in sys.path
+_backend_dir = str(Path(__file__).resolve().parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
 from config import settings
+
+
 
 logger = logging.getLogger("verdant_shield.email_service")
 

@@ -2,7 +2,7 @@
 SQLAlchemy ORM models for Verdant Shield — AI-First Verification System.
 Supports both PostgreSQL and SQLite.
 """
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from typing import Optional
 from sqlalchemy import (
     Integer, String, Float, Boolean, Date, DateTime, Text, JSON,
@@ -11,6 +11,11 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 from database import Base
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
+
 
 
 # ─── Enums ───────────────────────────────────────────────────────────────────
@@ -53,7 +58,7 @@ class District(Base):
     state: Mapped[str] = mapped_column(String(100), nullable=False)
     lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     beneficiaries: Mapped[list["Beneficiary"]] = relationship("Beneficiary", back_populates="district")
     users: Mapped[list["User"]] = relationship("User", back_populates="district")
@@ -72,7 +77,7 @@ class User(Base):
     dob: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     address: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     district: Mapped[Optional["District"]] = relationship("District", back_populates="users")
     audit_logs: Mapped[list["AuditLog"]] = relationship("AuditLog", back_populates="user")
@@ -90,7 +95,7 @@ class Scheme(Base):
     eligibility_criteria: Mapped[Optional[dict]] = mapped_column(JSON, default=dict)
     benefit_amount: Mapped[float] = mapped_column(Float, default=0.0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     applications: Mapped[list["Application"]] = relationship("Application", back_populates="scheme")
 
@@ -111,7 +116,8 @@ class Beneficiary(Base):
     declared_income: Mapped[float] = mapped_column(Float, default=0.0)
     status: Mapped[str] = mapped_column(String(20), default="pending")
     photo_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
+
 
     district: Mapped[Optional["District"]] = relationship("District", back_populates="beneficiaries")
     applications: Mapped[list["Application"]] = relationship("Application", back_populates="beneficiary")
@@ -153,11 +159,11 @@ class Application(Base):
     fraud_predicted_type: Mapped[str] = mapped_column(String(100), default="None / Clean Application")
     ai_evidence: Mapped[list] = mapped_column(JSON, default=list)
     ai_confidence_score: Mapped[float] = mapped_column(Float, default=95.0)
-    ai_verified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    ai_verified_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     # Current Application Operational Status (AI is primary driver)
     status: Mapped[str] = mapped_column(String(30), default="Approved")
-    submitted_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    submitted_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
     
     # Officer Override Governance (Strict Traceability - Zero Silent Modifications)
     is_overridden: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -188,7 +194,7 @@ class ApplicationDocument(Base):
     application_id: Mapped[int] = mapped_column(ForeignKey("applications.id"), nullable=False, index=True)
     document_name: Mapped[str] = mapped_column(String(200), nullable=False)
     document_type: Mapped[str] = mapped_column(String(100), nullable=False)
-    uploaded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
     verification_status: Mapped[str] = mapped_column(String(50), default="pending_verification")
     is_demo: Mapped[bool] = mapped_column(Boolean, default=True)
     storage_path: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
@@ -215,7 +221,7 @@ class ApplicationStatusHistory(Base):
     status: Mapped[str] = mapped_column(String(50), nullable=False)
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     changed_by_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     application: Mapped["Application"] = relationship("Application", back_populates="status_history")
 
@@ -240,7 +246,7 @@ class AIPrediction(Base):
     potential_leakage_amount: Mapped[float] = mapped_column(Float, default=0.0)
 
     model_version: Mapped[str] = mapped_column(String(50), default="3.0.0-ai-first-verification")
-    predicted_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    predicted_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     application: Mapped["Application"] = relationship("Application", back_populates="prediction")
 
@@ -252,7 +258,7 @@ class FraudLog(Base):
     beneficiary_id: Mapped[int] = mapped_column(ForeignKey("beneficiaries.id"), nullable=False, index=True)
     detection_type: Mapped[str] = mapped_column(String(100), nullable=False)
     details: Mapped[Optional[dict]] = mapped_column(JSON, default=dict)
-    detected_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    detected_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     beneficiary: Mapped["Beneficiary"] = relationship("Beneficiary", back_populates="fraud_logs")
 
@@ -263,11 +269,14 @@ class Complaint(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     filed_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     beneficiary_id: Mapped[int] = mapped_column(ForeignKey("beneficiaries.id"), nullable=False, index=True)
+    reported_target: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     complaint_type: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[Text] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String(50), default="open")
+    officer_action: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     evidence_urls: Mapped[Optional[list]] = mapped_column(JSON, default=list)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=True)
 
     filed_by_user: Mapped["User"] = relationship("User", back_populates="complaints")
     beneficiary: Mapped["Beneficiary"] = relationship("Beneficiary", back_populates="complaints")
@@ -281,7 +290,7 @@ class Notification(Base):
     title: Mapped[str] = mapped_column(String(300), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
 
 class AuditLog(Base):
@@ -294,7 +303,7 @@ class AuditLog(Base):
     entity_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     details: Mapped[Optional[dict]] = mapped_column(JSON, default=dict)
     ip_address: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     user: Mapped[Optional["User"]] = relationship("User", back_populates="audit_logs")
 
@@ -307,6 +316,7 @@ class PasswordResetToken(Base):
     token_hash: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     user: Mapped["User"] = relationship("User", back_populates="reset_tokens")
+

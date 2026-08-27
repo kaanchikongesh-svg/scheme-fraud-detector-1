@@ -409,7 +409,168 @@ def seed_database(db, count: int = 500):
     db.commit()
     print(f"  -> Stored {pred_count} AI leakage predictions")
     ensure_application_support_records(db)
+    seed_complaints(db)
     print("[SEED] Seeding successfully completed!")
+
+
+SAMPLE_GRIEVANCES_SEED = [
+    {
+        "id": 1,
+        "beneficiary_id": 1,
+        "reported_target": "TEST-BEN-001 (Aadhaar Seed Duplication - Chennai)",
+        "complaint_type": "Suspected Duplicate Beneficiary",
+        "description": "Suspected duplicate application detected where beneficiary Aadhaar hash matches another registered record across KMUT and CMCHIS schemes.",
+        "status": "open",
+        "officer_action": "Pending initial scrutiny by Verifying Officer",
+        "evidence_urls": ["https://evidence.gov.in/docs/aadhaar_mismatch_001.pdf"],
+        "days_ago": 2,
+    },
+    {
+        "id": 2,
+        "beneficiary_id": 2,
+        "reported_target": "TEST-BEN-002 (Non-Existent Address - Madurai)",
+        "complaint_type": "Ghost Beneficiary",
+        "description": "Field verification report indicates applicant is not residing at declared address in Madurai Ward 4; village administrative officer flagged potential ghost entry.",
+        "status": "investigating",
+        "officer_action": "On-site physical inspection scheduled with District Revenue Inspector",
+        "evidence_urls": ["https://evidence.gov.in/reports/field_audit_madurai_02.pdf"],
+        "days_ago": 5,
+    },
+    {
+        "id": 3,
+        "beneficiary_id": 3,
+        "reported_target": "TEST-BEN-003 (Forged Income Certificate)",
+        "complaint_type": "Document Mismatch",
+        "description": "AI document forensic analysis detected baseline font misalignment and digital stamp tampering on submitted annual income certificate.",
+        "status": "investigating",
+        "officer_action": "Cross-checking with State Revenue Department e-District API records",
+        "evidence_urls": ["https://evidence.gov.in/forensics/ela_scan_income_003.png"],
+        "days_ago": 4,
+    },
+    {
+        "id": 4,
+        "beneficiary_id": 4,
+        "reported_target": "TEST-BEN-004 (Multiple Scheme Discrepancy)",
+        "complaint_type": "Wrong Scheme Benefit",
+        "description": "Applicant receiving simultaneous higher education stipend while registered under active government employment payroll database.",
+        "status": "open",
+        "officer_action": "Flagged by automated cross-scheme deduplication matrix",
+        "evidence_urls": ["https://evidence.gov.in/flags/payroll_crossmatch_004.pdf"],
+        "days_ago": 1,
+    },
+    {
+        "id": 5,
+        "beneficiary_id": 7,
+        "reported_target": "TEST-BEN-005 (Middleman Fraud Ring Cluster)",
+        "complaint_type": "Unauthorized Intermediary",
+        "description": "Multiple applications originating from single shared mobile number (+91 9900112233) and common bank account cluster.",
+        "status": "investigating",
+        "officer_action": "Fraud ring investigation initiated; accounts temporarily placed on verification hold",
+        "evidence_urls": ["https://evidence.gov.in/network/ring_graph_cluster_005.json"],
+        "days_ago": 7,
+    },
+    {
+        "id": 6,
+        "beneficiary_id": 6,
+        "reported_target": "TEST-BEN-006 (Bank Account DBT Redirect)",
+        "complaint_type": "Payment Irregularity",
+        "description": "DBT installment routed to third-party savings account due to typo in IFSC routing code during manual portal data entry.",
+        "status": "resolved",
+        "officer_action": "Account re-verified and mapped to primary Aadhaar-linked NPCI bank branch; DBT disbursement re-routed",
+        "evidence_urls": ["https://evidence.gov.in/banking/dbt_reconciliation_006.pdf"],
+        "days_ago": 14,
+    },
+    {
+        "id": 7,
+        "beneficiary_id": 13,
+        "reported_target": "TEST-BEN-007 (Exceeded Income Ceiling)",
+        "complaint_type": "Eligibility Violation",
+        "description": "Applicant annual household income exceeds prescribed scheme ceiling (₹2,50,000/yr) based on updated ITR financial year returns.",
+        "status": "resolved",
+        "officer_action": "Verified through Tax Records Gateway; application rejected and benefit recovery notice dispatched",
+        "evidence_urls": ["https://evidence.gov.in/tax/itr_verification_007.pdf"],
+        "days_ago": 10,
+    },
+    {
+        "id": 8,
+        "beneficiary_id": 5,
+        "reported_target": "TEST-BEN-008 (Biometric Mismatch & Photo Variance)",
+        "complaint_type": "Identity Verification Issue",
+        "description": "High facial variance and mismatched demographic data between applicant uploaded photo and centralized Aadhaar vault record.",
+        "status": "open",
+        "officer_action": "Citizen invited to nearest e-Seva Kendra for biometric re-authentication",
+        "evidence_urls": ["https://evidence.gov.in/biometrics/face_match_report_008.pdf"],
+        "days_ago": 0,
+    },
+]
+
+
+def seed_complaints(db, reset: bool = False) -> int:
+    """Seed realistic test grievance records safely into the database."""
+    from db_models import Complaint, User, Beneficiary
+    import datetime as dt
+
+    if reset:
+        db.query(Complaint).delete()
+        db.commit()
+
+    # Find citizen user id (demo citizen user ID 4 or first citizen)
+    citizen_user = db.query(User).filter(User.role == "citizen").first()
+    filed_by_id = citizen_user.id if citizen_user else 4
+
+    now = dt.datetime.now(dt.timezone.utc)
+    added_count = 0
+
+
+    for item in SAMPLE_GRIEVANCES_SEED:
+        # Check if record already exists by ID or reported_target
+        existing = db.query(Complaint).filter(
+            (Complaint.id == item["id"]) | (Complaint.reported_target == item["reported_target"])
+        ).first()
+
+        b_id = item["beneficiary_id"]
+        # Verify beneficiary exists in DB or fallback
+        b_exists = db.query(Beneficiary).filter(Beneficiary.id == b_id).first()
+        if not b_exists:
+            first_b = db.query(Beneficiary).first()
+            b_id = first_b.id if first_b else 1
+
+        created_time = now - dt.timedelta(days=item["days_ago"], hours=item.get("hours", 3))
+
+        if existing:
+            # Update fields if needed to ensure standard test content
+            existing.filed_by_id = filed_by_id
+            existing.beneficiary_id = b_id
+            existing.reported_target = item["reported_target"]
+            existing.complaint_type = item["complaint_type"]
+            existing.description = item["description"]
+            existing.status = item["status"]
+            existing.officer_action = item["officer_action"]
+            existing.evidence_urls = item["evidence_urls"]
+            if not existing.created_at:
+                existing.created_at = created_time
+            existing.updated_at = now
+        else:
+            complaint_obj = Complaint(
+                id=item["id"],
+                filed_by_id=filed_by_id,
+                beneficiary_id=b_id,
+                reported_target=item["reported_target"],
+                complaint_type=item["complaint_type"],
+                description=item["description"],
+                status=item["status"],
+                officer_action=item["officer_action"],
+                evidence_urls=item["evidence_urls"],
+                created_at=created_time,
+                updated_at=created_time,
+            )
+            db.add(complaint_obj)
+            added_count += 1
+
+    db.commit()
+    total_complaints = db.query(Complaint).count()
+    print(f"[SEED] Sample complaints ensured (Added: {added_count}, Total in DB: {total_complaints})")
+    return total_complaints
 
 
 def ensure_application_support_records(db):

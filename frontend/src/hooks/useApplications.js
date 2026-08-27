@@ -71,8 +71,7 @@ export function useApplicationDetail(applicationId) {
       setIsFallback(false);
       return { success: true, application: response };
     } catch (err) {
-      setApplication(previous => previous ? { ...previous, status, investigation_status: ['under_review', 'flagged'].includes(status) ? 'open' : previous.investigation_status, history: [...(previous.history || []), { status, note: note || `Status changed to ${status}`, created_at: new Date().toISOString() }] } : previous);
-      return { success: true, isMock: true, error: err.message };
+      return { success: false, error: err.message || 'Failed to update application status' };
     }
   };
 
@@ -80,12 +79,12 @@ export function useApplicationDetail(applicationId) {
     try {
       const response = await api.request(`/api/v1/documents/${documentId}/verify`, { method: 'PATCH', body: JSON.stringify({ status, reason }) });
       setApplication(previous => previous ? { ...previous, documents: (previous.documents || []).map(document => document.id === documentId ? response : document) } : previous);
-      return { success: true };
+      return { success: true, document: response };
     } catch (error) {
-      setApplication(previous => previous ? { ...previous, documents: (previous.documents || []).map(document => document.id === documentId ? { ...document, verification_status: status, status, rejection_reason: reason || null } : document) } : previous);
-      return { success: true, isMock: true, error: error.message };
+      return { success: false, error: error.message || 'Failed to verify document' };
     }
   };
+
 
   return { application, loading, error, isFallback, refetch: fetchApplication, updateStatus, verifyDocument };
 }

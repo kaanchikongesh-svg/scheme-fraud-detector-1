@@ -1,7 +1,12 @@
-from __future__ import annotations
-
-from datetime import datetime
+import sys
+from pathlib import Path
+from datetime import datetime, timezone
 from typing import Any
+
+# Ensure backend directory is in sys.path
+_backend_dir = str(Path(__file__).resolve().parent.parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
 
 from .repository import mongo_repository
 from config import settings
@@ -17,7 +22,7 @@ def _application_document(application: dict[str, Any]) -> dict[str, Any]:
         "concernLevel": application.get("concern_level"),
         "leakageProbability": application.get("leakage_probability"),
         "createdAt": application.get("application_date"),
-        "updatedAt": datetime.utcnow(),
+        "updatedAt": datetime.now(timezone.utc),
     }
 
 
@@ -37,7 +42,7 @@ def _document_document(document: dict[str, Any], application_id: str | None = No
         "verificationStatus": document.get("verification_status") or document.get("status"),
         "ocrExtracted": document.get("ocr_extracted"),
         "createdAt": document.get("uploaded_at"),
-        "updatedAt": datetime.utcnow(),
+        "updatedAt": datetime.now(timezone.utc),
     }
 
 
@@ -57,8 +62,8 @@ class MongoSync:
             "districtId": user.get("district_id"),
             "dob": str(user.get("dob")) if user.get("dob") else None,
             "address": user.get("address"),
-            "createdAt": user.get("created_at") or datetime.utcnow(),
-            "updatedAt": datetime.utcnow(),
+            "createdAt": user.get("created_at") or datetime.now(timezone.utc),
+            "updatedAt": datetime.now(timezone.utc),
         }
         return mongo_repository.upsert_user(user_doc)
 
@@ -76,17 +81,18 @@ class MongoSync:
         if not settings.MONGODB_DUAL_WRITE:
             return False
         return mongo_repository.append_verification_audit({
-            "applicationId": str(application_id),
-            "documentId": str(document_id),
+            "applicationId": application_id,
+            "documentId": document_id,
             "action": "document_verification",
             "decision": decision,
             "evidence": evidence or [],
             "modelVersion": "sqlalchemy-document-pipeline",
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
         })
 
     def health(self) -> dict[str, Any]:
         return mongo_repository.health()
+
 
 
 mongo_sync = MongoSync()

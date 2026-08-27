@@ -21,7 +21,8 @@ Automated Workflow:
 import hashlib
 import networkx as nx
 from typing import List, Dict, Any, Tuple, Optional
-from datetime import datetime
+from datetime import datetime, timezone
+
 
 SALT = "verdant_government_scheme_salt_2024"
 
@@ -351,8 +352,9 @@ class AIFirstVerificationEngine:
             "potential_leakage_amount": potential_leakage,
             "confidence_score": 96.5 if ai_decision == DECISION_AI_APPROVED else 92.0,
             "model_version": "3.0.0-ai-first-verification",
-            "verified_at": datetime.utcnow().isoformat(),
+            "verified_at": datetime.now(timezone.utc).isoformat(),
         }
+
 
     def evaluate(self, beneficiary: Dict[str, Any], scheme_id: Optional[int] = None) -> Dict[str, Any]:
         """Backward-compatible wrapper for existing endpoints."""

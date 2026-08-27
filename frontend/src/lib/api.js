@@ -14,14 +14,18 @@ const getApiBaseUrl = () => {
                     window.location.hostname.startsWith('10.') ||
                     window.location.hostname === '0.0.0.0';
     if (isLocal) {
-      return '';
+      if (window.location.port === '5173') {
+        return '';
+      }
+      return 'http://127.0.0.1:8000';
     }
     return 'https://ai-scheme-leakage-detector.onrender.com';
   }
-  return 'https://ai-scheme-leakage-detector.onrender.com';
+  return 'http://127.0.0.1:8000';
 };
 
 const API_BASE_URL = getApiBaseUrl();
+
 
 class ApiClient {
   constructor(baseUrl = API_BASE_URL) {

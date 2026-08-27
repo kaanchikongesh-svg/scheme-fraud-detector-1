@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 from datetime import date, datetime
 from enum import Enum
 
@@ -169,7 +169,8 @@ class NetworkGraphResponse(BaseModel):
 # ─── Complaints ───────────────────────────────────────────────
 
 class ComplaintCreate(BaseModel):
-    beneficiary_id: Optional[int] = None
+    beneficiary_id: Optional[Union[int, str]] = None
+    reported_target: Optional[str] = None
     complaint_type: str
     description: str
     evidence_urls: Optional[List[str]] = None
@@ -177,12 +178,20 @@ class ComplaintCreate(BaseModel):
 
 class ComplaintResponse(BaseModel):
     id: int
+    grievance_id: Optional[str] = None
     filed_by: int
-    beneficiary_id: int
+    beneficiary_id: Optional[int] = None
+    reported_target: Optional[str] = None
     complaint_type: str
+    category: Optional[str] = None
     description: str
     status: str = "open"
+    officer_action: Optional[str] = None
+    evidence_urls: Optional[List[str]] = None
     created_at: Optional[str] = None
+    filed_date: Optional[str] = None
+    updated_at: Optional[str] = None
+    application_id: Optional[str] = None
 
 
 class DocumentVerificationRequest(BaseModel):
@@ -201,4 +210,5 @@ class UserProvisionRequest(BaseModel):
 class ComplaintStatusUpdate(BaseModel):
     status: str
     notes: Optional[str] = None
+    officer_action: Optional[str] = None
 

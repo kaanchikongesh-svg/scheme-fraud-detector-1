@@ -99,8 +99,10 @@ def test_complete_reset_flow():
 
         assert reset_token_record is not None, "PasswordResetToken record was not created in DB!"
         assert reset_token_record.used_at is None, "Token marked used prematurely"
-        assert reset_token_record.expires_at > datetime.datetime.utcnow(), "Token created expired"
+        rec_exp = reset_token_record.expires_at.replace(tzinfo=datetime.timezone.utc) if reset_token_record.expires_at.tzinfo is None else reset_token_record.expires_at
+        assert rec_exp > datetime.datetime.now(datetime.timezone.utc), "Token created expired"
         print(f"[OK] PasswordResetToken generated and verified in DB (expires in ~15 mins)")
+
 
         # 4. Test invalid token
         invalid_res = client.post("/api/v1/auth/reset-password", json={
@@ -139,7 +141,7 @@ def test_complete_reset_flow():
         test_record = PasswordResetToken(
             user_id=db_user.id,
             token_hash=raw_token_hash,
-            expires_at=datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
+            expires_at=datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=15)
         )
         db.add(test_record)
         db.commit()
@@ -169,10 +171,11 @@ def test_complete_reset_flow():
         expired_record = PasswordResetToken(
             user_id=db_user.id,
             token_hash=expired_token_hash,
-            expires_at=datetime.datetime.utcnow() - datetime.timedelta(minutes=10) # 10 mins in past
+            expires_at=datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=10) # 10 mins in past
         )
         db.add(expired_record)
         db.commit()
+
 
         expired_res = client.post("/api/v1/auth/reset-password", json={
             "token": expired_raw_token,
