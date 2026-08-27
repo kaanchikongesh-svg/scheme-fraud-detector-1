@@ -17,8 +17,12 @@ from pydantic import field_validator
 
 
 class Settings(BaseSettings):
-    # Database
+    # Database Configuration (PostgreSQL primary with seamless SQLite fallback)
     DATABASE_URL: str = "postgresql://verdant:verdant_pass@localhost:5432/leakage_db"
+    POSTGRES_URL: str = "postgresql://verdant:verdant_pass@localhost:5432/leakage_db"
+    SQLITE_URL: str = ""
+    DATABASE_TYPE: str = "postgresql"
+
 
     # JWT
     SECRET_KEY: str = "govkavach-ai-secret-key-CHANGE-IN-PRODUCTION-2026"
