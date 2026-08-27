@@ -19,7 +19,9 @@ const getApiBaseUrl = () => {
       }
       return 'http://127.0.0.1:8000';
     }
-    return 'https://ai-scheme-leakage-detector.onrender.com';
+    // On Vercel production, use same-origin relative URLs to leverage Vercel rewrites.
+    // This completely eliminates ERR_BLOCKED_BY_CLIENT ad-blocker false positives.
+    return '';
   }
   return 'http://127.0.0.1:8000';
 };
@@ -56,9 +58,12 @@ class ApiClient {
       headers: this.getHeaders(options.headers, !isFormData),
     };
 
+    // Default 75s timeout to gracefully allow Render free tier containers to wake up
+    const requestTimeout = options.timeout || 75000;
+
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), options.timeout || 25000);
+      const timeoutId = setTimeout(() => controller.abort(), requestTimeout);
 
       const response = await fetch(url, {
         ...config,
@@ -122,13 +127,13 @@ class ApiClient {
       return await response.json();
     } catch (error) {
       if (error.name === 'AbortError') {
-        const err = new Error('Backend request timed out. Please try again.');
+        const err = new Error('The backend server is waking up from idle mode. Please try again in a moment.');
         err.code = 'BACKEND_TIMEOUT';
         err.status = 504;
         throw err;
       }
       if (!error.status) {
-        const err = new Error('Backend service is unavailable. Please check that the backend service is running and accessible.');
+        const err = new Error('Backend service is connecting. If this is the first request, the server is spinning up.');
         err.code = 'BACKEND_UNAVAILABLE';
         err.status = 503;
         throw err;
@@ -136,6 +141,7 @@ class ApiClient {
       throw error;
     }
   }
+
 
   get(endpoint, options = {}) {
     return this.request(endpoint, { ...options, method: 'GET' });

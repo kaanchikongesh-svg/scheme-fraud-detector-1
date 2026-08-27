@@ -6,11 +6,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://ai-scheme-leakage-detector.onrender.com/api/$1"
+      "destination": "https://scheme-fraud-detector.onrender.com/api/$1"
     },
     {
       "source": "/health",
-      "destination": "https://ai-scheme-leakage-detector.onrender.com/health"
+      "destination": "https://scheme-fraud-detector.onrender.com/health"
     },
     {
       "source": "/(.*)",
@@ -18,5 +18,6 @@
     }
   ]
 }
+
 
 
