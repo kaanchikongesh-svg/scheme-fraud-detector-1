@@ -39,10 +39,8 @@ SchemeSecure AI is an enterprise welfare scheme fraud detection, AI document ver
 | :--- | :--- | :--- | :--- |
 | **System Admin** | `admin@gov.in` | `admin123` | Global Jurisdiction |
 | **District Officer** | `do.rao@gov.in` | `officer123` | Lucknow District |
-| **Verifying Officer** | `vo.k@gov.in` | `verify123` | Mumbai District |
+| **Verifying Officer** | `vo.k@gov.in` | `officer123` | Mumbai District |
 | **Citizen** | `citizen@gmail.com` | `citizen123` | Grievance Portal |
-
-*(You can also use password `demo` on any account)*
 
 ---
 
@@ -74,82 +72,13 @@ SchemeSecure AI is an enterprise welfare scheme fraud detection, AI document ver
 
 ## 🚀 Quickstart Guide
 
-### 1. Run Frontend (React / Vite)
+### 1. Run Development (Both Backend & Frontend)
 ```bash
-cd frontend
-npm install
 npm run dev
 ```
-Open your browser at **`http://localhost:5173`**.
-
-### 2. Run Backend (FastAPI + Swagger Docs)
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-```
-Interactive Swagger API documentation will be available at **`http://localhost:8000/docs`**.
-
-### 3. Full Stack with Docker
-```bash
-docker-compose up --build
-```
-
-### 4. Optional MongoDB Atlas Sidecar Migration
-
-SQLAlchemy remains the source of truth during the incremental migration. MongoDB is disabled by default. Configure these values in `backend/.env` or the process environment only when an Atlas deployment is available:
-
-```env
-MONGODB_ENABLED=true
-MONGODB_DUAL_WRITE=true
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>/<database>
-MONGODB_DATABASE=government_scheme_leakage
-```
-
-Mirror applications and documents in repeatable batches:
-
-```bash
-cd backend
-python -m scripts.migrate_sql_to_mongo --batch-size 100 --after-id 0
-```
-
-The command upserts by stable `applicationId` and `documentId`, creates indexes, and can be resumed with a higher `--after-id`. API writes remain SQL-first; Mongo dual writes are best-effort and never make a request fail. `/health` reports Mongo as `not_configured`, `connected`, or `unavailable`.
-
----
-
-## 📂 Project Architecture
-
-```
-AI GOVERNMENT SCHEME LEAKAGE DETECTOR/
-├── backend/
-│   ├── main.py              # FastAPI REST endpoints
-│   ├── ai_engine.py         # Multi-stage risk scoring & NetworkX graph engine
-│   ├── mongodb/              # Optional Atlas repositories and dual-write adapter
-│   ├── scripts/              # Incremental SQL-to-Mongo migration commands
-│   ├── models.py            # Pydantic data schemas
-│   ├── synthetic_data.py    # Seed generator with planted fraud patterns
-│   ├── requirements.txt     # Python dependencies
-│   └── Dockerfile.backend
-├── src/
-│   ├── components/          # StatCard, RiskBadge, ReasonList, Sidebar, Header, Layout
-│   ├── data/                # Synthetic datasets (120+ beneficiaries, 12 schemes, 20 districts)
-│   ├── pages/
-│   │   ├── auth/            # Animated login with demo accounts
-│   │   ├── dashboard/       # KPI cards, Recharts pie/line/bar charts
-│   │   ├── beneficiaries/   # Filterable list + AI detail view with SVG gauge
-│   │   ├── ai/              # Risk Explorer + Force-Directed Network Graph
-│   │   ├── geomap/          # District fraud heatmap
-│   │   ├── schemes/         # Scheme registry & eligibility
-│   │   ├── analytics/       # Reports & model metrics
-│   │   ├── complaints/      # Citizen grievance portal
-│   │   └── admin/           # User management & audit logs
-│   ├── App.jsx              # Routing & session state
-│   ├── index.css            # Dark slate design system & tokens
-│   └── main.jsx
-├── docker-compose.yml
-├── Dockerfile.frontend
-└── package.json
-```
+- React Frontend: **`http://localhost:5173`**
+- FastAPI Backend: **`http://127.0.0.1:8000`**
+- Swagger Documentation: **`http://127.0.0.1:8000/docs`**
 
 ---
 
@@ -157,4 +86,4 @@ AI GOVERNMENT SCHEME LEAKAGE DETECTOR/
 - **Salted SHA-256 Hashing:** Raw Aadhaar and bank account numbers are hashed before ingestion.
 - **Zero Raw PII Storage:** Strict data-masking across all UI components.
 - **Immutable Audit Trails:** Every officer action (Approve, Reject, Flag) is logged with timestamps.
->>>>>>> 99c32ba (Initial commit: AI Government Scheme Leakage Detector full platform)
+
