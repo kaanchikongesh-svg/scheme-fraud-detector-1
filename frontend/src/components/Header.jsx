@@ -43,16 +43,22 @@ export default function Header({ pathname }) {
     let active = true;
     const checkBackend = async () => {
       try {
-        const response = await api.get('/health', { timeout: 2500 });
-        if (active) setBackendConnected(response?.status === 'ok');
+        const response = await api.get('/api/v1/health', { timeout: 15000 });
+        if (active) setBackendConnected(response?.status === 'ok' || response?.database === 'connected');
       } catch {
-        if (active) setBackendConnected(false);
+        try {
+          const fallback = await api.get('/health', { timeout: 15000 });
+          if (active) setBackendConnected(fallback?.status === 'ok' || fallback?.database === 'connected');
+        } catch {
+          if (active) setBackendConnected(false);
+        }
       }
     };
     checkBackend();
-    const interval = window.setInterval(checkBackend, 30000);
+    const interval = window.setInterval(checkBackend, 20000);
     return () => { active = false; window.clearInterval(interval); };
   }, []);
+
 
   return (
     <header className="header">
