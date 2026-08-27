@@ -481,7 +481,7 @@ def perform_cross_document_comparison(documents: list[Any], db_session: Any = No
         # Check duplicate SHA-256 hash in DB across OTHER applications
         if sha256 and db_session is not None:
             try:
-                from backend.db_models import ApplicationDocument
+                from db_models import ApplicationDocument
                 existing_dup = db_session.query(ApplicationDocument).filter(
                     ApplicationDocument.sha256_hash == sha256,
                     ApplicationDocument.application_id != application_id if application_id else True,
@@ -493,6 +493,7 @@ def perform_cross_document_comparison(documents: list[Any], db_session: Any = No
                     reasons.append(f"Duplicate document hash detected (SHA-256 matches existing application #{existing_dup.application_id})")
             except Exception:
                 pass
+
 
         fields = ocr_data.get("fields") if isinstance(ocr_data, dict) and "fields" in ocr_data else ocr_data
         if not isinstance(fields, dict) or not fields:

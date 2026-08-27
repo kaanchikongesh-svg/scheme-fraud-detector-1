@@ -289,26 +289,31 @@ def _sync_application(application: Application, db: Session) -> None:
 
 
 def _sync_document(document: ApplicationDocument) -> None:
-    forensics = (document.ocr_extracted or {}).get("forensics") or {}
-    mongo_sync.document({
-        "id": document.id,
-        "application_id": document.application.application_number,
-        "doc_type": document.doc_type or document.document_type,
-        "document_type": document.document_type,
-        "document_name": document.document_name,
-        "original_filename": document.original_filename,
-        "storage_path": document.storage_path,
-        "mime_type": document.mime_type,
-        "size_bytes": document.size_bytes,
-        "verification_status": document.verification_status,
-        "ocr_extracted": document.ocr_extracted,
-        "forensics": forensics,
-        "document_authenticity": forensics.get("document_authenticity", "AUTHENTIC"),
-        "tampering_detected": forensics.get("tampering_detected", False),
-        "confidence": forensics.get("confidence", 0.95),
-        "modelVersion": forensics.get("model_version", "casia-document-forensics-v1"),
-        "uploaded_at": document.uploaded_at,
-    }, document.application.application_number)
+    try:
+        app_num = getattr(document.application, "application_number", None) if hasattr(document, "application") and document.application else f"APP-{document.application_id}"
+        forensics = (document.ocr_extracted or {}).get("forensics") or {}
+        mongo_sync.document({
+            "id": document.id,
+            "application_id": app_num or str(document.application_id),
+            "doc_type": document.doc_type or document.document_type,
+            "document_type": document.document_type,
+            "document_name": document.document_name,
+            "original_filename": document.original_filename,
+            "storage_path": document.storage_path,
+            "mime_type": document.mime_type,
+            "size_bytes": document.size_bytes,
+            "verification_status": document.verification_status,
+            "ocr_extracted": document.ocr_extracted,
+            "forensics": forensics,
+            "document_authenticity": forensics.get("document_authenticity", "AUTHENTIC"),
+            "tampering_detected": forensics.get("tampering_detected", False),
+            "confidence": forensics.get("confidence", 0.95),
+            "modelVersion": forensics.get("model_version", "casia-document-forensics-v1"),
+            "uploaded_at": document.uploaded_at,
+        }, app_num)
+    except Exception:
+        pass
+
 
 
 def _persist_document(upload: UploadFile, doc_type: str, beneficiary: Beneficiary, application: Application, current_user: User, db: Session) -> ApplicationDocument:
@@ -1299,14 +1304,28 @@ async def upload_application_document(
     current_user: User = Depends(require_roles(RoleEnum.admin, RoleEnum.district_officer, RoleEnum.verifying_officer, RoleEnum.citizen)),
     db: Session = Depends(get_db),
 ):
-    app_row = _get_application_row(application_id, current_user, db)
-    document = _persist_document(file, doc_type, app_row.beneficiary, app_row, current_user, db)
-    _write_audit(db, current_user.id, "DOCUMENT_UPLOADED", "document", document.id, {"application_id": app_row.id, "doc_type": doc_type})
-    db.commit()
-    db.refresh(document)
-    _sync_document(document)
-    _sync_application(app_row, db)
-    return _document_dict(document)
+    try:
+        app_row = _get_application_row(application_id, current_user, db)
+        document = _persist_document(file, doc_type, app_row.beneficiary, app_row, current_user, db)
+        try:
+            _write_audit(db, current_user.id, "DOCUMENT_UPLOADED", "document", document.id, {"application_id": app_row.id, "doc_type": doc_type})
+        except Exception:
+            pass
+        db.commit()
+        db.refresh(document)
+        try:
+            _sync_document(document)
+            _sync_application(app_row, db)
+        except Exception:
+            pass
+        return _document_dict(document)
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Document upload error: {str(e)}")
+
 
 
 @app.post("/api/v1/beneficiaries/{beneficiary_id}/documents", tags=["Documents"])
