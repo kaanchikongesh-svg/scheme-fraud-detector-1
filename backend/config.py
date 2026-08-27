@@ -82,11 +82,12 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USERNAME: str = ""
     SMTP_PASSWORD: str = ""
-    SMTP_FROM_EMAIL: str = "noreply@example.com"
-    SMTP_FROM_NAME: str = "SchemeSecure AI — Scheme Fraud Detection & Verification System"
+    SMTP_FROM_EMAIL: str = "noreply@schemesecure.ai"
+    SMTP_FROM_NAME: str = "SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System"
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False
     FRONTEND_URL: str = "http://localhost:5173"
+
     SMS_PROVIDER: str = ""
     SMS_API_KEY: str = ""
     SMS_SENDER_ID: str = ""

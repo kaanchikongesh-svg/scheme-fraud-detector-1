@@ -255,9 +255,10 @@ export default function Register() {
       {/* ── LEFT PANEL ─────────────────────────────────────────── */}
       <div className="login-left">
         <div className="login-logo-area">
-          <div className="login-logo">🏛️</div>
-          <div className="login-logo-title">Tamil Nadu Citizen Welfare Portal</div>
-          <div className="login-logo-sub">AI-Assisted Direct Benefit Scheme Application</div>
+          <img src="/logo.svg" alt="SchemeSecure AI" style={{ width: 56, height: 56, marginBottom: 12, filter: 'drop-shadow(0 4px 14px rgba(37,99,235,0.5))' }} />
+          <div className="login-logo-title">SchemeSecure AI</div>
+          <div className="login-logo-sub">AI Government Scheme Fraud Detection & Verification System</div>
+
 
           <div className="login-floating-card" style={{ marginTop: 24 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--blue-400)', marginBottom: 8 }}>

@@ -1,6 +1,6 @@
 """
-Verdant Shield — FastAPI application.
-All endpoints are backed by PostgreSQL via SQLAlchemy.
+SchemeSecure AI — FastAPI application.
+All endpoints are backed by PostgreSQL via SQLAlchemy with SQLite fallback.
 Auth uses real bcrypt password validation + HS256 JWT.
 All AI outputs use neutral, non-accusatory language.
 The AI Leakage Probability is advisory-only — no endpoint auto-rejects.
@@ -74,10 +74,10 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="SchemeSecure AI — Scheme Fraud Detection & Verification API",
+    title="SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System",
     description=(
         "Backend services for welfare scheme management, "
-        "AI leakage probability scoring, and network anomaly detection. "
+        "AI fraud detection, leakage probability scoring, and document forensics. "
         "All outputs use neutral, non-accusatory language. "
         "The AI probability is advisory-only — final decisions require an authorized officer."
     ),
@@ -95,6 +95,7 @@ if settings.FRONTEND_URL and settings.FRONTEND_URL not in _cors_origins_env:
 _known_origins = [
     "https://ai-scheme-leakage-detector.onrender.com",
     "https://govkavach-ai.vercel.app",
+    "https://schemesecure-ai.vercel.app",
 ]
 for _origin in _known_origins:
     if _origin not in _cors_origins_env:
@@ -115,8 +116,9 @@ app.add_middleware(
 def root():
     return {
         "status": "success",
-        "message": "AI Scheme Leakage Detector API is running"
+        "message": "SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System API is running"
     }
+
 
 
 @app.get("/health", tags=["Health"])

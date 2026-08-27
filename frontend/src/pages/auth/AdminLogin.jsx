@@ -44,8 +44,9 @@ export default function AdminLogin() {
           <img src="/logo.svg" alt="SchemeSecure AI" style={{ width: 60, height: 60, marginBottom: 12, filter: 'drop-shadow(0 4px 16px rgba(37,99,235,0.6))' }} />
           <div className="login-logo-title" style={{ fontSize: 26, letterSpacing: 0.5 }}>SchemeSecure AI</div>
           <div className="login-logo-sub" style={{ fontSize: 13, color: '#93c5fd', marginTop: 6 }}>
-            State Administration & Scheme Leakage Adjudication Console
+            AI Government Scheme Fraud Detection & Verification System
           </div>
+
           <div style={{ marginTop: 28, padding: '14px 18px', background: 'rgba(255,255,255,0.06)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', maxWidth: 360 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', marginBottom: 4 }}>
               🔒 RESTRICTED GOVERNMENT ACCESS

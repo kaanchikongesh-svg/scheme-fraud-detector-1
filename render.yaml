@@ -1,7 +1,7 @@
 services:
   # ─── React Frontend Static Site ──────────────────────────────────────────────
   - type: web
-    name: govkavach-frontend
+    name: schemesecure-frontend
     runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
@@ -10,12 +10,12 @@ services:
       - key: VITE_API_URL
         fromService:
           type: web
-          name: govkavach-backend
+          name: schemesecure-backend
           property: host
 
   # ─── Python FastAPI Backend Service ──────────────────────────────────────────
   - type: web
-    name: govkavach-backend
+    name: schemesecure-backend
     runtime: python
     rootDir: backend
     buildCommand: pip install -r requirements.txt
@@ -28,7 +28,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: FRONTEND_URL
-        value: https://govkavach-ai.vercel.app
+        value: https://schemesecure-ai.vercel.app
       - key: MONGODB_URI
         sync: false
       - key: MONGODB_DATABASE
@@ -45,3 +45,4 @@ services:
         sync: false
       - key: SMTP_FROM_NAME
         value: "SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System"
+

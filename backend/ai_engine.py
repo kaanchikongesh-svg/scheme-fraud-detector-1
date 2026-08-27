@@ -1,5 +1,5 @@
 """
-Verdant Shield — AI-First Verification Engine.
+SchemeSecure AI — AI Government Scheme Fraud Detection & Verification Engine.
 The AI performs primary automated verification for every government scheme application.
 Manual officer verification is NOT the normal workflow.
 

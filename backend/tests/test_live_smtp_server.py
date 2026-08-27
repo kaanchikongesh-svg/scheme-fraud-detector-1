@@ -21,8 +21,9 @@ captured_emails = []
 
 class LocalSMTPHandler(socketserver.StreamRequestHandler):
     def handle(self):
-        self.wfile.write(b"220 127.0.0.1 VerdantShield SMTP Ready\r\n")
+        self.wfile.write(b"220 127.0.0.1 SchemeSecureAI SMTP Ready\r\n")
         self.wfile.flush()
+
         data_buffer = []
         is_data_mode = False
 
@@ -81,9 +82,10 @@ def run_live_smtp_test():
         test_email_service.password = ""
         test_email_service.use_tls = False
         test_email_service.use_ssl = False
-        test_email_service.from_email = "noreply@verdantshield.gov.in"
-        test_email_service.from_name = "Verdant Shield — AI Leakage Detector"
+        test_email_service.from_email = "noreply@schemesecure.ai"
+        test_email_service.from_name = "SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System"
         test_email_service.frontend_url = "http://localhost:5173"
+
 
         # 3. Send real email via SMTP
         test_token = "secure_random_single_use_token_987654321"

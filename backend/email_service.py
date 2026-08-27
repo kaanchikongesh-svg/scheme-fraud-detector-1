@@ -1,5 +1,5 @@
 """
-Email Service for Verdant Shield — AI Government Scheme Leakage Detector.
+Email Service for SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System.
 Handles SMTP connection, email template compilation, and password reset delivery.
 """
 import smtplib
@@ -21,7 +21,7 @@ from config import settings
 
 
 
-logger = logging.getLogger("verdant_shield.email_service")
+logger = logging.getLogger("schemesecure_ai.email_service")
 
 
 class EmailService:
@@ -32,11 +32,12 @@ class EmailService:
         self.port = settings.SMTP_PORT
         self.username = settings.SMTP_USERNAME.strip() if settings.SMTP_USERNAME else ""
         self.password = settings.SMTP_PASSWORD.strip() if settings.SMTP_PASSWORD else ""
-        self.from_email = settings.SMTP_FROM_EMAIL.strip() if settings.SMTP_FROM_EMAIL else (self.username or "noreply@example.com")
-        self.from_name = settings.SMTP_FROM_NAME or "Verdant Shield — AI Leakage Detector"
+        self.from_email = settings.SMTP_FROM_EMAIL.strip() if settings.SMTP_FROM_EMAIL else (self.username or "noreply@schemesecure.ai")
+        self.from_name = settings.SMTP_FROM_NAME or "SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System"
         self.use_tls = settings.SMTP_USE_TLS
         self.use_ssl = settings.SMTP_USE_SSL
         self.frontend_url = (settings.FRONTEND_URL or "http://localhost:5173").rstrip("/")
+
 
     @property
     def is_configured(self) -> bool:
@@ -159,13 +160,14 @@ AI Government Scheme Fraud Detection & Verification System
           <tr>
             <td style="background-color: #0a1222; padding: 18px 30px; border-top: 1px solid rgba(255,255,255,0.06); text-align: center;">
               <p style="margin: 0; font-size: 11px; color: #64748b;">
-                © 2026 AI Government Scheme Leakage Detector · Government of Tamil Nadu
+                © 2026 SchemeSecure AI · AI Government Scheme Fraud Detection & Verification System
               </p>
               <p style="margin: 4px 0 0; font-size: 10px; color: #475569;">
                 This is an automated system email. Please do not reply directly to this message.
               </p>
             </td>
           </tr>
+
         </table>
       </td>
     </tr>

@@ -1,7 +1,8 @@
 """
-SQLAlchemy ORM models for Verdant Shield — AI-First Verification System.
+SQLAlchemy ORM models for SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System.
 Supports both PostgreSQL and SQLite.
 """
+
 from datetime import datetime, date, timezone
 from typing import Optional
 from sqlalchemy import (

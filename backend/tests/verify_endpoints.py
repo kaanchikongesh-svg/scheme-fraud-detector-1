@@ -19,8 +19,9 @@ def test_routes():
     print("[1] root() handler returned:", r_root)
     assert r_root == {
         "status": "success",
-        "message": "AI Scheme Leakage Detector API is running"
+        "message": "SchemeSecure AI — AI Government Scheme Fraud Detection & Verification System API is running"
     }, f"Root endpoint returned unexpected payload: {r_root}"
+
 
     # 2. Test health_check() handler with db session
     db = SessionLocal()
