@@ -36,9 +36,25 @@ TN_DISTRICTS = {
 
 
 def validate_doc_type(doc_type: str) -> str:
-    if doc_type not in ALLOWED_DOC_TYPES:
-        raise HTTPException(status_code=400, detail=f"doc_type must be one of: {', '.join(sorted(ALLOWED_DOC_TYPES))}")
-    return doc_type
+    clean = doc_type.strip().lower().replace("-", "_")
+    if clean in ALLOWED_DOC_TYPES:
+        return clean
+    # Normalize common scheme document aliases
+    if "income" in clean:
+        return "income_certificate"
+    if "identity" in clean or "aadhaar" in clean or "voter" in clean or "id" in clean:
+        return "identity_proof"
+    if "bank" in clean or "passbook" in clean:
+        return "bank_passbook"
+    if "address" in clean or "ration" in clean or "residence" in clean or "school" in clean or "transfer" in clean:
+        return "address_proof"
+    if "community" in clean or "caste" in clean:
+        return "community_certificate"
+    if "land" in clean or "patta" in clean:
+        return "land_record"
+    if "photo" in clean:
+        return "photo"
+    return "identity_proof"
 
 
 def sniff_mime(content: bytes) -> str | None:
@@ -57,10 +73,13 @@ def read_upload(upload: UploadFile) -> tuple[bytes, str]:
         raise HTTPException(status_code=400, detail="Document exceeds the 10 MB size limit")
     actual_mime = sniff_mime(content)
     if actual_mime is None or actual_mime not in ALLOWED_MIME_TYPES:
-        raise HTTPException(status_code=400, detail="Unsupported or invalid document content. Upload a valid PDF, JPG, or PNG file.")
-    if upload.content_type and upload.content_type != actual_mime:
-        raise HTTPException(status_code=400, detail="The declared file type does not match the file content")
+        declared = (upload.content_type or "").split(";")[0].strip().lower()
+        if declared in ALLOWED_MIME_TYPES:
+            actual_mime = declared
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported document format. Please upload a valid PDF, JPG, or PNG document.")
     return content, actual_mime
+
 
 
 def save_private_document(content: bytes, mime_type: str) -> Path:

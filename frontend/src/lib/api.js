@@ -172,6 +172,7 @@ class ApiClient {
     return new Promise((resolve, reject) => {
       const request = new XMLHttpRequest();
       request.open('POST', `${this.baseUrl}${endpoint}`);
+      request.timeout = 60000; // 60s timeout for cloud OCR & AI forensics
       const token = this.getToken();
       if (token) request.setRequestHeader('Authorization', `Bearer ${token}`);
       request.upload.onprogress = event => {
@@ -179,15 +180,23 @@ class ApiClient {
       };
       request.onload = () => {
         if (request.status >= 200 && request.status < 300) {
-          try { resolve(JSON.parse(request.responseText)); } catch { reject(new Error('Invalid upload response')); }
+          try { resolve(JSON.parse(request.responseText)); } catch { reject(new Error('Invalid upload response format')); }
         } else {
-          try { reject(new Error(JSON.parse(request.responseText).detail || `HTTP Error ${request.status}`)); } catch { reject(new Error(`HTTP Error ${request.status}`)); }
+          try {
+            const parsed = JSON.parse(request.responseText);
+            const msg = parsed.detail || parsed.message || parsed.error || `Upload failed (HTTP ${request.status})`;
+            reject(new Error(typeof msg === 'string' ? msg : JSON.stringify(msg)));
+          } catch {
+            reject(new Error(`Upload failed with status ${request.status}`));
+          }
         }
       };
-      request.onerror = () => reject(new Error('Upload failed: backend unavailable'));
+      request.ontimeout = () => reject(new Error('Document processing timed out. The server is processing large files. Please try again.'));
+      request.onerror = () => reject(new Error('Document upload connection failed. Please check network connection.'));
       request.send(formData);
     });
   }
+
 }
 
 export const api = new ApiClient();
